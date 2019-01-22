@@ -1,0 +1,614 @@
+/**
+ * Created by wangjuan on 2017/5/16.
+ */
+var commonJs = function () {
+    var language=publicJs.language();
+    var callFn;
+    var uuid=$.cookie('uuid');
+    var loginHtml = '<style>.cent-xx-box li.right .inpbox input.sr:focus{box-shadow: 0.5px 0.5px 0.5px 1px #d3d3d3;;outline: none;border:1px solid #d0d0d0}.cent-xx-box li.right .inpbox input.regisWornning,.cent-xx-box li.right .inpbox input.regisWornning:focus{outline: none;border:2px solid #ff5f12}.cent-xx-box li.right .inpbox input.regisSuccess,.cent-xx-box li.right .inpbox input.regisSuccess:focus{outline: none;border:2px solid #5fbf5f}</style><style>.shade .bor .l .input-minoru:focus{box-shadow: 0.5px 0.5px 0.5px 1px #d3d3d3;;outline: none;border:1px solid #d0d0d0}.shade .bor .l .regisWornning,.shade  .bor .l .regisWornning:focus{outline: none;border:2px solid #ff5f12}.shade .bor .l .regisSuccess,.shade  .bor .l .regisSuccess:focus{outline: none;border:2px solid #5fbf5f}</style><div class="shade loginShade" style="display:none;position: fixed;z-index: 1000000;"> <div class="login"> <div class="bor"><a href="javascript:;" class="close-login"> </a> <div class="tit">'+language.login+'</div> <div class="l"> <ul> <li><span>'+language.loginName+'：</span> <input type="text" class="input-minoru login-ico" placeholder="'+language.pleaseUser+'"/> <div class="bz"><img src="//s3.dwnews.net/v5/images/zc-cw.png"/></div> </li> <li><span>'+language.pass+'：</span> <input type="password" class="input-minoru code-ico" placeholder="'+language.pleasePass+'" /> <div class="bz"><img src="//s3.dwnews.net/v5/images/zc-cw.png"/></div> </li> <div class="opt"><input name="" type="checkbox" class="rememberMe" value=\'\'/> <p>'+language.tenLogin+'</p></div> <div class="opt"><a href="javascript:;" class="log-bot">'+language.loginTijiao+'</a><a href="'+dwnews.dw5_blog+'/center-findPwd.html" class="forget">'+language.forget+'</a> </div> <div class="opt non"><span>'+language.siteNot+'?</span><a href="javascript:;" class="reg">'+language.registNow+'?</a></div> </ul> <div class="r"> <div class="ad"><!--<script>OAS_RICH("x04");</script>--><img src="//s0.dwnews.net/v5/images/ad/denglu300-250.jpg"></div> <div class="but"><h1>'+language.other+'</h1><a href="javascript:;" title="" class="box-facebook"><img src="//s3.dwnews.net/v5/images/login-f.jpg"/></a><a href="javascript:;" title="" class="box-twitter"><img src="//s3.dwnews.net/v5/images/login-t.jpg"/></a></div> </div> </div> </div> </div> </div>'
+    var registerHtml = '<div class="shade registerShade" style="display:none;position: fixed;z-index: 1000000;"> <div class="register"> <div class="bor"><a href="javascript:;"   class="close-login">&nbsp;</a> <div class="tit">'+language.registUser+'</div> <div class="l"> <ul> <li><span>'+language.email+'：</span> <input type="text" placeholder="'+language.adviceEmail+'" class="input-minoru" / ><i>*</i> <div class="bz"><img src="//s3.dwnews.net/v5/images/zc-zq.png"/></div> </li> <li><span>'+language.nick+'：</span> <input type="text" placeholder="'+language.adviceNick+'"class="input-minoru" / ><i>*</i> <div class="bz"><img src="//s3.dwnews.net/v5/images/zc-cw.png"/></div> </li> <li><span>'+language.pass+'：</span> <input type="password" placeholder="'+language.advicePass+'"class="input-minoru"/><i>*</i> <div class="bz"><img src="//s3.dwnews.net/v5/images/zc-cw.png"/></div> </li> <li><span>'+language.agin+'：</span> <input type="password" placeholder="'+language.adviceAgin+'"class="input-minoru"/><i>*</i> <div class="bz"><img src="//s3.dwnews.net/v5/images/zc-cw.png"/></div> </li> <li><span>'+language.yanzheng+'：</span> <input type="text" class="yzm input-minoru"/> <img class="yanzhengma" src="//s3.dwnews.net/v5/images/reg-yzm.jpg"/> <e class="kbq">'+language.visible+'？</e> <a href="javascript:;" class="yzmh">'+language.change+'</a> <div class="bz"><img src="//s3.dwnews.net/v5/images/zc-cw.png"/></div> </li> <div class="opt"><input name="" type="checkbox" checked="checked" value=\'\'/> <p>'+language.agree+'</p></div> <div class="opt"><a href="javascript:;" class="log-bot">'+language.registTijiao+'</a><a href="javascript:;"class="forget">'+language.clear+'</a></div> </ul> <div class="r"><div class="ad"><!--<script>OAS_RICH("x04");</script>--><img src="//s0.dwnews.net/v5/images/ad/zhuce300-250.jpg"></div> <div class="but"><h1>'+language.other+'</h1><a href="javascript:;" title="" class="box-facebook"><img src="//s3.dwnews.net/v5/images/login-f.jpg"/></a><a href="javascript:;" title="" class="box-twitter"><img src="//s3.dwnews.net/v5/images/login-t.jpg"/></a></div> </div> </div> </div> </div> </div>';
+    var registerSucces='<div class="shade sucessShade" style="position: fixed;z-index: 1000000"> <div class="register"> <div class="bor bor-cg"> <a href="javascript:;" class="close-login">&nbsp;</a> <div class="tit cg-left">'+language.regSuccess+'</div> <div class="cg-box"> <div class="duibox"> <img src="//s3.dwnews.net/v5/images/cent-dui.png">'+language.prosit+'！<br>'+language.in+'&nbsp;<a href="'+dwnews.dw5_blog+'/index.php?r=profile/index">'+language.self+'</a>&nbsp;'+language.or+'&nbsp;<a href="index.html">'+language.back+'</a> </div> </div> </div> </div> </div>';
+    function close(eleParent1, eleParent2) {
+        $(eleParent1).css({"display": "none"});
+        $(eleParent2).css({"display": "none"})
+    };
+    function win_open(url){
+        window.location.href=url
+    };
+    function titleLenth(str,n,omit){
+        var omit=omit||"";
+        var r=/[^\x00-\xff]/g;
+        if(str.replace(r,"mm").length<=n){return str;}
+        var m=Math.floor(n/2);
+
+        for(var i=m;i<str.length;i++){
+            if(str.substr(0,i).replace(r,"mm").length>=n){
+                return str.substr(0,i)+omit;
+            }
+        }
+        return str;
+    };
+    /*退出*/
+    function quitLogin(){
+        $(".cent-edt .tuichu a").html(language.quit+"...")
+        $.ajax({
+            url:"//passport-api.dwnews.com/index.php?r=ucenter/logout",
+            dataType: "jsonp",
+            jsonpCallback: "callback",
+            success:function(data){
+                if(data.code==200000){
+                    $.cookie('dwUid','', { expires: -1,domain:dwnews.domain,path:dwnews.path});
+                    $.cookie('dwUsername','', { expires: -1,domain:dwnews.domain,path:dwnews.path});
+                    $.cookie('dwEmail','', { expires: -1,domain:dwnews.domain,path:dwnews.path});
+                    $.cookie('rememberMe','', { expires: -1,domain:dwnews.domain,path:dwnews.path});
+                    $.cookie('dwUserimg','', { expires: -1,domain:dwnews.domain,path:dwnews.path});
+					$.cookie('dw5_social',null, { expires: -1,domain:dwnews.domain,path:dwnews.path});
+                    window.location.href=dwnews.dw5_blog;
+                }
+            },
+            error:function(){
+                layer.msg(language.overTime,{icon: 0});
+            }
+        })
+
+    };
+    function register(load,ele,parent) {
+        $(load).append(commonJs.registerData.loading);
+        /*邮箱验证input propertychange*/
+        $(ele).eq(0).bind('change', function () {
+            commonJs.email(parent,0,$(this),true)
+        });
+        /*昵称验证*/
+        $(ele).eq(1).bind('change', function () {
+            commonJs.nickname(parent,1,$(this))
+        });
+        $(ele).eq(2).bind('change', function () {
+            commonJs.passWord(parent,2,$(this))
+        });
+        $(ele).eq(3).bind('change', function () {
+            commonJs.aginPass(parent,3,$(this),$(ele).eq(2))
+        });
+        /*验证码验证*/
+        $(ele).eq(4).bind('change', function () {
+            commonJs.yanzheng(parent,4,$(this))
+        });
+    };
+    function login(){
+        $(".login .bor").append(commonJs.registerData.loading);
+        $(".loginShade .input-minoru").eq(0).blur(function () {
+            if($(this).val()==""){
+                $(".loginShade .bz").eq(0).html('<img src="' + commonJs.registerData.imgUrl[1] + '" />'+commonJs.registerData.loginData[0][1] + '')
+                $(".loginShade .bz").eq(0).css({display: "block"});
+            }else{
+                $(".loginShade .bz").eq(0).css({display: "none"});
+            }
+        })
+        $(".loginShade .input-minoru").eq(1).blur(function () {
+            if($(this).val()==""){
+                $(".loginShade .bz").eq(1).html('<img src="' + commonJs.registerData.imgUrl[1] + '" />'+commonJs.registerData.loginData[1][1] + '')
+                $(".loginShade .bz").eq(1).css({display: "block"});
+            }else{
+                $(".loginShade .bz").eq(1).css({display: "none"});
+            }
+        })
+
+    };
+    function init(){
+        var uuid=$.cookie('uuid');
+        var localUrl=location.href;
+        $("body").append(loginHtml);
+        $("body").append(registerHtml);
+        if($.cookie('dwUid')&&$.cookie('dwUsername')){
+            var name=$.cookie('dwUsername');
+            $(".nav-icobox .dl").unbind("click");
+            var susMessage = '<div class="hy" style="text-align: center"><a href="'+dwnews.dw5_blog+'/index.php?r=profile/index" target="_blank" class="self" title="'+name+'">'+name+' </a></div><div class="nh">'+language.hello+'！</div><span>|</span><a href="//duoweicn.dwnews.com" class="yk" target="_blank">'+language.monthly+'</a><span>|</span><a class="contact" href="//www.dwnews.com/contactus.html" target="_blank">'+language.contact+'</a>';
+            $(".top-scbox .top-sc-text").html(susMessage);
+            $(".fxbox .dlzc").html('<a href="'+dwnews.dw5_blog+'/index.php?r=profile/index" target="_blank" title="'+name+'">'+name+'</a>'+language.hello+'！').addClass("dlh");
+            $(".dladzc").html('<a href="'+dwnews.dw5_blog+'/index.php?r=profile/index" target="_blank" title="'+name+'">'+name+'</a>'+language.hello+'！')
+            $(".fx-scbox .fx-scbox-text").html('<a href="'+dwnews.dw5_blog+'/index.php?r=profile/index" target="_blank" class="self" title="'+name+'">'+name+' </a></div><div class="nh"  style="float: right;color:#333;"> '+language.hello+'！</div>');
+            $(".nav-icobox li.dl").css("background","none");
+            $(".dladzc").css({"display":"none",width:"170px"});
+            $(".nav-icobox .dl").html('<a href="'+dwnews.dw5_blog+'/index.php?r=profile/index" target="_blank" title="'+name+'">'+name+'</a>').removeClass("dl");;
+            $(".loginLoading").css("display","none");
+            $(".nav-icobox>ul>li>a").eq(0).text(titleLenth($(".nav-icobox>ul>li>a").eq(0).text(),6,"..."));
+            $(".hy a").text(titleLenth($(".hy a").text(),10,"..."));
+            $(".fx-scbox-text a").each(function(){$(this).text(titleLenth($(this).text(),6,"..."));});
+            if(localUrl.indexOf("big5")>-1){$(".contact").attr("href","//www.dwnews.com/big5/contactus.html");}else{$(".contact").attr("href","//www.dwnews.com/contactus.html");
+            };
+            var headImage=$.cookie("dwUserimg");
+            var userInfo={"data":{"user_img":headImage,"username":name}};
+            commonJs.userInfoPhoto(userInfo);
+        }else{
+            $(".nav-icobox .dl").click(function(){
+                commonJs.loginLayer();
+            });
+            var urlFace="//user-login-api.dwnews.com/index.php?r=login/OAuthLogin&type=facebook&uuid="+uuid+"&url="+localUrl+"";
+            var urlTwit="//user-login-api.dwnews.com/index.php?r=login/OAuthLogin&type=twitter&uuid="+uuid+"&url="+localUrl+"";
+            $(".box-facebook").click(function(){
+                $(this).attr("href","javascript:"+win_open(urlFace)+";");
+            })
+            $(".box-twitter").click(function(){
+                $(this).attr("href","javascript:"+win_open(urlTwit)+";");
+            })
+        }
+        $(".shade .bz").css({display: "none"});
+        $(".l .yanzhengma").css({width:81, height:43});
+        $(".floatbar .bar-box").css({display:"none"});
+        $(".floatbar .goBack").hide();
+        $(".top-menu-box").css({"display":"block",paddingBottom:0});
+        $(".top-menu-box .top-mn-sq,.menu-qt,.menu-my,.top-menu-box h3,.top-menu-box h4,.right-tit .xiala li,.right-tit .xiala").css({"display":"none"});
+        register(".register .bor",".registerShade .input-minoru",".registerShade");
+        login();
+    };
+    var ifTijiao=function(parent,Obj,suc){
+        if ($('' + parent + ' .regisSuccess').length == 5) {
+            commonJs.loginXhr("//passport-api.dwnews.com/index.php?r=ucenter/register",Obj,suc)
+        }else{
+            $(".loginLoading").css("display","none");
+            for (var i = 0; i < $('' + parent + ' .input-minoru').length-2; i++) {
+                if ($('' + parent + ' .input-minoru').eq(i).val() =="")
+                {
+                    $("" + parent + " .bz").eq(i).html('<img src="' + commonJs.registerData.imgUrl[1] + '" />' + commonJs.registerData.registerText[i][2] + '');
+                    $("" + parent + " .bz").eq(i).css({display: "block"});
+                    $(".loginLoading").css("display","none");
+                    break;
+                }
+            }
+        }
+    };
+    return {
+        registerData:{
+            sizeNum: 14,
+            sizeNum1: 16,
+            ///^([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+@([a-zA-Z0-9]+[_|\_|\.]?)*[a-zA-Z0-9]+\.[a-zA-Z]{2,3}$/
+            ///^(\w)+(\.\w+)*@(\w)+((\.\w{2,3}){1,3})$/
+            regex: [/^(\w)+(\.\w+)*@(\w)+((\.[A-Za-z]{2,3}){1,3})$/, /^[a-zA-Z\d\_\u2E80-\u9FFF]{1,18}$/, /^[^\s]{6,16}$/],
+            loading:'<div class="loginLoading" style="display:none;background: rgba(255,255,255,0.3) url(\'//s3.dwnews.net/v5/images/loading.gif\') center no-repeat;width:100%;text-align:center;line-height:80%;height:100%;position: absolute;left:0;top:0"></div>',
+            imgUrl: ["//s3.dwnews.net/v5/images/zc-zq.png", "//s3.dwnews.net/v5/images/zc-cw.png"],
+            registerText: language.registerText,
+            centerNickname:language.centerNickname,
+            ajaxTex:language.ajaxTex,
+            loginText:language.loginText,
+            loginData:language.loginData
+        },
+        testXhr:function(){
+            $.ajax({
+                url: "//user-login-api.dwnews.com/index.php?r=login/getCaptcha",
+                dataType: "jsonp",
+                jsonpCallback: "callback",
+                success: function(data){
+                    var CaptUrl=data.url;
+                    var CaptCode=data.code;
+                    $(".yanzhengma").attr({
+                        "src":CaptUrl,
+                        "dataCode":CaptCode
+                    })
+                }
+            })
+        },
+        loadAdd: function (){
+            init();
+        },
+        login: function (){
+            $(".denglu").click(function () {
+                commonJs.loginLayer()
+            });
+            $(".zhuce").click(function () {
+                commonJs.registerLayer()
+            });
+            $(".loginShade .close-login").click(function () {
+                $('.loginShade .input-minoru').each(function (i, ele) {$(this).val("");})
+                $(".loginShade .bz").css({display: "none"});
+                close(".loginShade", ".login")
+            });
+            $(".registerShade .close-login").click(function () {
+                $('.registerShade .input-minoru').each(function (i, ele) {
+                    $(this).removeClass("regisWornning regisSuccess");
+                    $(".registerShade .bz").css({display: "none"});
+                    $(this).val("");
+                })
+                close(".registerShade", ".register")
+            });
+            $(".reg").click(function () {
+                close(".loginShade", ".login"),commonJs.registerLayer()
+            });
+            $(".registerShade .log-bot").click(function () {
+                commonJs.tijiaoRegister(".registerShade",ifTijiao)
+            });
+            $(".registerShade .forget").click(function () {
+                $('.registerShade .input-minoru').each(function (i, ele) {
+                    $(this).removeClass("regisWornning regisSuccess");
+                    $(".registerShade .bz").css({display: "none"});
+                    $(this).val("");
+                })
+            })
+            $(".yzmh").click(function(){
+                commonJs.testXhr();
+                $(".yzm").removeClass("regisSuccess");
+                commonJs.registerStyle(".registerShade", $(this).val() == $(".yanzhengma").attr("dataCode"),4,4,commonJs.registerData.registerText);
+            })
+            $(".loginShade .log-bot").click(function(){
+                commonJs.tijiaoLogin(".loginShade",".opt",0)
+            });
+            $(".cent-edt .tuichu").click(function(){
+                quitLogin();
+            });
+            /*登录注册绑定回车键*/
+            $(document).keydown(function(event){
+                if(event.keyCode == 13){
+                    if($(".login .input-minoru").is(":focus")){
+                        $('.loginShade .log-bot').click();
+                    }else if($(".register .input-minoru").is(":focus")){
+                        $('.registerShade .log-bot').click();
+                    }else if($(".top-sc .inp01").is(":focus")){
+                        $('.top-sc .inp02').click();
+                    }else if($(".nav-ssbox .left").is(":focus")){
+                        $('.nav-ssbox .right').click();
+                    }else if($(".fx-sc .inp01").is(":focus")){
+                        $('.fx-sc .inp02').click();
+                    }
+
+                }
+            });
+        },
+        loginLayer:function(ss){
+            $(".loginShade").css({"display": "block"});
+            $(".login").css({"display": "block"});
+            callFn=ss;
+        },
+        registerLayer:function(){
+            commonJs.testXhr();
+            $(".registerShade").css({"display": "block"});
+            $(".register").css({"display": "block"});
+        },
+        /*登录成功后设置cookie*/
+        setCookie:function(params,ele){
+            var rememberTime;
+            var t;
+            if($(""+ele+" input[type='checkbox']").is(':checked')){rememberTime=10;}else{rememberTime=1;}
+            if(rememberTime==10){t=1;}else{t=0;}
+            $.cookie("dwUid",params.data.uid,{expires: rememberTime,domain:dwnews.domain,path:dwnews.path});
+            $.cookie("dwEmail",params.data.email,{expires: rememberTime,domain:dwnews.domain,path:dwnews.path});
+            $.cookie("dwUsername",params.data.username,{expires: rememberTime,domain:dwnews.domain,path:dwnews.path});
+            $.cookie("rememberMe",t,{expires: rememberTime,domain:dwnews.domain,path:dwnews.path});
+            $.cookie("dwUserimg",params.data.user_img,{expires: rememberTime,domain:dwnews.domain,path:dwnews.path});
+        },
+        registerStyle:function(parent,ifTure,n,m,dataText) {
+        if (ifTure) {
+            $("" + parent + " .bz").eq(n).html('<img src="' + commonJs.registerData.imgUrl[0] + '" />'+ dataText[m][0] + '')
+            $("" + parent + " .bz").eq(n).css({display: "block"});
+            $("" + parent + " .input-minoru").eq(n).removeClass("regisWornning");
+            $("" + parent + " .input-minoru").eq(n).addClass("regisSuccess");
+            if (n <= 3&&parent==".registerShade") {
+                $("" + parent + " .input-minoru").eq(n).blur(function () {
+                    $("" + parent + " .bz").eq(n).css({display: "none"});
+                })
+            }
+        } else {
+            $("" + parent + " .bz").eq(n).html('<img src="' + commonJs.registerData.imgUrl[1] + '" />'+ dataText[m][1] + '')
+            $("" + parent + " .bz").eq(n).css({display: "block"});
+            $("" + parent + " .input-minoru").eq(n).removeClass("regisSuccess");
+            $("" + parent + " .input-minoru").eq(n).addClass("regisWornning");
+            $("" + parent + " .input-minoru").eq(n).blur(function () {
+                if($(this).val()==""){
+                    $("" + parent + " .bz").eq(n).css({display: "none"});
+                }else{
+                    $("" + parent + " .bz").eq(n).css({display: "block"});
+                }
+            })
+        }
+    },
+    //视觉频道登录后处理
+    userInfoPhoto:function(data){
+        var localUrl=location.href;
+        if(localUrl.indexOf("//photo.dwnews.com/")>-1){
+            $("a.denglu").parent("li").hide();
+            $("li.user").show();
+            $("li.user").find("a.navHeadLink").attr({"href":dwnews.dw5_blog+'/index.php?r=profile/index',"target":"_blank"});
+            $("li.user").find("img.navHeadImage").attr("src",data.data.user_img);
+            var userPanel='<dl><dd><a href="'+dwnews.dw5_blog+'/index.php?r=profile/index" target="_blank">'+data.data.username+'</a></dd><dd><a href="'+dwnews.dw5_blog+'/index.php?r=profile/index" target="_blank">'+language.self+'</a></dd><dd><a href="'+dwnews.dw5_blog+'/index.php?r=profile/index">安全退出</a></dd></dl>';
+            $("div.topLoginBox").html(userPanel);
+        }
+    },
+    //登陆后样式
+    loginStyle:function(data){
+            var localUrl=location.href;
+            var name=data.data.username;
+            var susMessage = '<div class="hy" style="text-align: center"><a href="'+dwnews.dw5_blog+'/index.php?r=profile/index" target="_blank" class="self" title="'+name+'">'+name+' </a></div><div class="nh"> '+language.hello+'！</div><span>|</span><a href="//duoweicn.dwnews.com" class="yk" target="_blank">'+language.monthly+'</a><span>|</span><a class="contact" href="//www.dwnews.com/contactus.html" target="_blank">'+language.contact+'</a>';
+            $(".top-scbox .top-sc-text").html(susMessage);
+            $(".nav-icobox .dl").unbind("click");
+            //图集内文页 页头登陆后样式
+            $(".fxbox .dlzc").html('<a href="'+dwnews.dw5_blog+'/index.php?r=profile/index" target="_blank" title="'+name+'">'+name+'</a>'+language.hello+'！').addClass("dlh");
+            $(".dladzc").html('<a href="'+dwnews.dw5_blog+'/index.php?r=profile/index" target="_blank" title="'+name+'">'+name+'</a>'+language.hello+'！');
+            $(".fx-scbox .fx-scbox-text").html('<a href="'+dwnews.dw5_blog+'/index.php?r=profile/index" target="_blank" class="self" title="'+name+'">'+name+' </a></div><div class="nh"  style="float: right;color:#333;"> '+language.hello+'！</div>');
+            $(".nav-icobox li.dl").css("background","none")
+            $(".nav-icobox .dl").html('<a href="'+dwnews.dw5_blog+'/index.php?r=profile/index" target="_blank" title="'+name+'">'+name+'</a>').removeClass("dl");
+            $(".loginLoading").css("display","none");
+            $(".dladzc").css({"display":"none",width:"170px"});
+            $(".nav-icobox>ul>li>a").eq(0).text(titleLenth($(".nav-icobox>ul>li>a").eq(0).text(),6,"..."));
+            $(".fx-scbox-text a").each(function(){
+                $(this).text(titleLenth($(this).text(),6,"..."));
+            });
+            $(".hy a").text(titleLenth($(".hy a").text(),10,"..."));
+            if(localUrl.indexOf("big5")>-1){
+                $(".contact").attr("href","//www.dwnews.com/big5/contactus.html");
+            }else{
+                $(".contact").attr("href","//www.dwnews.com/contactus.html");
+            };
+            commonJs.userInfoPhoto(data);
+            if($(".dwk-login").length>0){
+                var dwkerLogin='<div class="dwk-login-top"> <div class="dwk-login-tpho"> <a target="_blank" href="'+dwnews.dw5_blog+'/index.php?r=profile/index"><img src="'+data.data.user_img+'"></a> </div> <h3><a target="_blank" href="'+dwnews.dw5_blog+'/index.php?r=profile/index">'+data.data.username+'</a></h3> <p>'+data.data.email+'</p> <ul> <li class="bg01"><a target="_blank" href="'+dwnews.dw5_blog+'/index.php?r=profile/topic">'+data.data.blog_count+'</a><span> '+language.blog+'</span></li> <li class="bg02"><a target="_blank" href="'+dwnews.dw5_blog+'/index.php?r=profile/receive_comment">'+data.data.receive_comment+'</a> '+language.receive+'</li> <li class="bg03"><a target="_blank" href="'+dwnews.dw5_blog+'/index.php?r=profile/index"><img src="//s3.dwnews.net/v5/images/dwk-lg-ico.png"></a> '+language.self+'</li> <li class="bg04"><a target="_blank" href="'+dwnews.dw5_blog+'/index.php?r=profile/myguanzhu">'+data.data.attention+'</a> '+language.attention+'</li> <li class="bg05"> <div class="xxwd"></div> <a target="_blank" href="'+dwnews.dw5_blog+'/index.php?r=profile/queue">'+data.data.notice+'</a> '+language.notice+'</li> <div class="clear"></div> </ul> </div>'
+                $(".dwk-login").find(".loginbox").remove();
+                $(".dwk-login").find(".zmmbox").remove();
+                $(".dwk-login").find(".dlzcbox").remove();
+                $(".dwk-login").find(".jxbox").remove();
+                $(".dwk-login").find(".fxobox").remove();
+                $(".dwk-login").removeClass("dwk-login-wei").find(".sqLunbo").removeClass("ggbox").addClass("dwk-gg").before(dwkerLogin);
+                $(".dwk-login-top").css({"background":"url("+data.data.user_backgroundimg+") no-repeat top center",backgroundSize:"200%"});
+                $(".sqLunbo>h2 img").attr("src","//s3.dwnews.net/v5/images/dwk-gg-ico.png");
+                $(".dwk-login-top>h3 a").html(publicJs.titleLenth($(".dwk-login-top>h3 a").html(),20));
+                $.ajax({
+                    url: ""+dwnews.dw5_blog+"/index.php?r=api/user_count",
+                    dataType: "jsonp",
+                    jsonpCallback: "callback",
+                    data:{uid:$.cookie('dwUid')},
+                    success: function(data){
+                        if(data.msg=="success"){
+                            $(".bg01>a").html(data.data.blog_count);$(".bg02>a").html(data.data.receive_comment);
+                            $(".bg04>a").html(data.data.attention);$(".bg05>a").html(data.data.notice);
+                            if(data.data.notice<=0){$(".dwk-login-top li .xxwd").css("display","none")}
+                        }else{
+                            layer.msg(data.msg,{icon: 0})
+                        }
+                    },
+                    error:function(){
+                        layer.msg(language.overTime,{icon: 0})
+                    }
+                });
+            }
+        },
+        email:function(parent,n,ele,flag,emaiUid){
+            emaiUid=emaiUid||"";
+            //flag=flag||true;
+            ele.removeClass("regisWornning regisSuccess");
+            commonJs.registerStyle(parent, commonJs.registerData.regex[0].test(ele.val()),n,0,commonJs.registerData.registerText);
+            if(ele.hasClass("regisSuccess")&&flag){
+                $.getJSON(
+                    "//user-login-api.dwnews.com/index.php?r=login/regCheckEmail&callback=?",
+                    {"email":ele.val(),"uid":emaiUid},
+                    function(data){
+                        if(!data.flg){
+                            commonJs.registerStyle(parent,data.flg,n,0,commonJs.registerData.ajaxTex);
+                        }
+                    });
+            }
+        },
+        nickname:function(parent,n,ele,nickUid){
+            nickUid=nickUid||"";
+            ele.removeClass("regisWornning regisSuccess");
+            commonJs.registerStyle(parent, commonJs.registerData.regex[1].test(ele.val()),n,1,commonJs.registerData.registerText);
+            if(ele.hasClass("regisSuccess")){
+                $.getJSON(
+                    "//user-login-api.dwnews.com/index.php?r=login/checkName&callback=?",
+                    {"username":ele.val(),"uid":nickUid},
+                    function(data){
+                        if(!data.flg){
+                            commonJs.registerStyle(parent,data.flg,n,1,commonJs.registerData.ajaxTex);
+                        }
+                    });
+            }
+        },
+        passWord:function(parent,n,ele){
+            ele.removeClass("regisWornning regisSuccess");
+            commonJs.registerStyle(parent, commonJs.registerData.regex[2].test(ele.val()),n,2,commonJs.registerData.registerText);
+        },
+        aginPass:function(parent,n,ele,ele1){
+            ele.removeClass("regisWornning regisSuccess");
+            commonJs.registerStyle(parent, ele.val() == ele1.val(),n,3,commonJs.registerData.registerText)
+        },
+        yanzheng:function(parent,n,ele){
+            ele.removeClass("regisWornning regisSuccess");
+            commonJs.registerStyle(parent,ele.val()== $(".yanzhengma").attr("dataCode"),n,4,commonJs.registerData.registerText);
+            if(ele.hasClass("regisSuccess")){
+                $.getJSON(
+                    "//user-login-api.dwnews.com/index.php?r=login/checkCaptcha&callback=?",
+                    {code:ele.val()},
+                    function(data){
+                        commonJs.registerStyle(parent,data.flg,n,4,commonJs.registerData.registerText);
+                        if(!data.flg){var CaptUrl=data.url;var CaptCode=data.code;$(".yanzhengma").attr({"src":CaptUrl, "dataCode":CaptCode})
+                        }
+                    });
+            }
+
+        },
+        tijiaoRegister:function (parent,fn,callback) {
+            $(""+parent+" .loginLoading").css("display","block");
+            var sendmail=0;
+            if($("" + parent + " .opt input[type='checkbox']").is(':checked')){sendmail=1;}else{sendmail=0;}
+            var registerObj={
+                username:Math.uuid(8, 10),
+                password:$('' + parent + ' .input-minoru').eq(2).val(),
+                email:$('' + parent + ' .input-minoru').eq(0).val(),
+                rememberMe:0,
+                url:window.location.href
+            }
+            var successFn=function(data){
+                if(data.code==200000){
+                    compeletFn(data)
+                }else{
+                    $(""+parent+" .loginLoading").css("display","none");
+                    $('.registerShade .input-minoru').each(function (i, ele) {
+                        $(this).removeClass("regisWornning regisSuccess");
+                        $(".registerShade .bz").css({display: "none"});
+                        $(this).val("");
+                    });
+                    layer.msg(data.msg,{icon: 0});
+                    return false;
+                }
+            }
+            function compeletFn(data){
+                var uuid=$.cookie('uuid');
+                var registerObj1={
+                    username:$('' + parent + ' .input-minoru').eq(1).val(),
+                    password:$('' + parent + ' .input-minoru').eq(2).val(),
+                    email:$('' + parent + ' .input-minoru').eq(0).val(),
+                    toemail:$('' + parent + ' .input-minoru').eq(0).val(),
+                    sendmail:sendmail,
+                    rememberMe:0,
+                    uid:data.data.uid,
+                    uuid:uuid,
+                    url: window.location.href
+                }
+                var successFn1=function(data1){
+                    if(data1.msg=="success"){
+                        compeletFn1(data1)
+                    }else{
+                        $(""+parent+" .loginLoading").css("display","none");
+                        $(''+parent+' .input-minoru').each(function (i, ele) {
+                            $(this).removeClass("regisWornning regisSuccess");
+                            $(""+parent+" .bz").css({display: "none"});
+                            $(this).val("");
+                        });
+                        layer.msg(data1.msg,{icon: 0});
+                    }
+                }
+                function compeletFn1(data1){
+                    if(data1.msg=="success"){
+                        if(parent==".registerShade"){
+                            commonJs.setCookie(data1,".loginShade .opt");
+                            commonJs.loginStyle(data1);
+                            $(parent).css({display: "none"});
+                            $(''+parent+' .input-minoru').each(function (i, ele) {
+                                $(this).removeClass("regisWornning regisSuccess");
+                                $(""+parent+" .bz").css({display: "none"});
+                                $(this).val("");
+                            });
+                            /*系统通知*/
+                            DW5.REGISTERMESSAGE();
+                            $("body").append(registerSucces);
+                            $(".sucessShade .close-login").click(function () {close(".sucessShade", ".register")});
+                            if (typeof callback === 'function'){callback();}
+                        }
+                    }else{
+                        $(""+parent+" .loginLoading").css("display","none");
+                        $(''+parent+' .input-minoru').each(function (i, ele) {
+                            $(this).removeClass("regisWornning regisSuccess");
+                            $(".registerShade .bz").css({display: "none"});
+                            $(this).val("");
+                        });
+                        layer.msg(data.msg,{icon: 0});
+                    }
+                }
+                if(data.code==200000){
+                    commonJs.loginXhr("//user-login-api.dwnews.com/index.php?r=login/register",registerObj1,successFn1)
+                }else{
+                    $(''+parent+' .input-minoru').each(function (i, ele) {
+                        $(this).removeClass("regisWornning regisSuccess");
+                        $(".registerShade .bz").css({display: "none"});
+                        $(this).val("");
+                    });
+                    layer.msg(data.msg,{icon: 0});
+                }
+            };
+            fn(parent,registerObj,successFn);
+        },
+        loginXhr:function(url,data,successFn){
+            $.ajax({
+                url:url,
+                dataType: "jsonp",
+                data:data,
+                jsonpCallback: "callback",
+                success:successFn,
+                error:function(){
+                    $(".loginLoading").css("display","none");
+                    layer.msg(language.overTime,{icon: 0});
+                }
+            })
+        },
+        tijiaoLogin:function (parent,opt,n,callback){
+            $(""+parent+" .loginLoading").css("display","block");
+            var rememberMe;
+            if($("" + parent + " "+opt+" input[type='checkbox']").is(':checked')){rememberMe=1;}else{rememberMe=0;}
+            var loginObj={
+                username:$('' + parent + ' .input-minoru').eq(n).val(),
+                password:$('' + parent + ' .input-minoru').eq(n+1).val(),
+                rememberMe:rememberMe
+            }
+            var loginSuccess=function(data){
+                var uuid=$.cookie('uuid');
+                if(data.code==200000){
+                    var loginObj1={
+                        uid:data.data.uid,
+                        username:data.data.username,
+                        email:data.data.email,
+                        password:data.data.password,
+                        rememberMe:data.data.rememberMe,
+                        uuid:uuid
+                    }
+                    var loginSuccess1= function(data1){
+                        if(data1.msg=="success"){
+                            layer.msg(""+language.loginSuccess+"！",{icon: 1});
+                            commonJs.setCookie(data1,".loginShade .opt");
+                            commonJs.loginStyle(data1);
+                            $(parent).css({display: "none"});
+                            $('' + parent + ' .input-minoru').each(function () {$(this).val("");});
+                            if (typeof callback === 'function'){
+                                callback();
+                            }
+                            if (typeof callFn === 'function'){
+                                callFn();
+                            }
+                        }else if(data1.code==0){
+                            $(""+parent+" .loginLoading").css("display","none");
+                            $("" + parent + " .bz").css({display: "none"});
+                            $("" + parent + " .bz").eq(n).html('<img src="' + commonJs.registerData.imgUrl[1] + '" />' +data1.msg+ '');
+                            $("" + parent + " .bz").eq(n).css({display: "block"});
+                        }else{
+                            $(""+parent+" .loginLoading").css("display","none");
+                            $('' + parent + ' .input-minoru').each(function (i, ele) {
+                                $(this).removeClass("regisWornning regisSuccess");
+                                $("" + parent + " .bz").css({display: "none"});
+                                $(this).val("");
+                            });
+                            layer.msg(data1.msg,{icon: 0});
+                        }
+                    }
+                    commonJs.loginXhr("//user-login-api.dwnews.com/index.php?r=login/checkLogin",loginObj1,loginSuccess1)
+                }else if(data.code==12882665){
+                    $(""+parent+" .loginLoading").css("display","none");
+                    $("" + parent + " .bz").css({display: "none"});
+                    $("" + parent + " .bz").eq(n).html('<img src="' + commonJs.registerData.imgUrl[1] + '" />' +data.msg+ '');
+                    $("" + parent + " .bz").eq(n).css({display: "block"});
+                }else if(data.code==5603587){
+                    $(""+parent+" .loginLoading").css("display","none");
+                    $("" + parent + " .bz").css({display: "none"});
+                    $("" + parent + " .bz").eq(n+1).html('<img src="' + commonJs.registerData.imgUrl[1] + '" />' +data.msg+ '');
+                    $("" + parent + " .bz").eq(n+1).css({display: "block"});
+                }else{
+                    $(""+parent+" .loginLoading").css("display","none");
+                    $(''+ parent + ' .input-minoru').each(function (i, ele) {
+                        $(this).removeClass("regisWornning regisSuccess");
+                        $("" + parent + " .bz").css({display: "none"});
+                        $(this).val("");
+                    });
+                    layer.msg(data.msg,{icon: 0});
+                }
+            }
+            if ($('' + parent + ' .input-minoru').eq(n).val() ==""||$('' + parent + ' .input-minoru').eq(n+1).val() ==""){
+                for (var i = 0; i < $('' + parent + ' .input-minoru').length; i++) {
+                    $(""+parent+" .loginLoading").css("display","none");
+                    $("" + parent + " .bz").css({display: "none"});
+                    $("" + parent + " .bz").eq(i).html('<img src="' + commonJs.registerData.imgUrl[1] + '" />' + commonJs.registerData.loginData[i][1] + '');
+                    $("" + parent + " .bz").eq(i).css({display: "block"});
+                    break;
+                }
+            }else{
+                commonJs.loginXhr("//passport-api.dwnews.com/index.php?r=ucenter/login",loginObj,loginSuccess);
+            }
+        },
+    }
+}();
+$(function () {
+    commonJs.loadAdd();
+    commonJs.login();
+})

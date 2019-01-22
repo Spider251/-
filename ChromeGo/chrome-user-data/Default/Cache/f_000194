@@ -1,0 +1,414 @@
+/**
+ * Created by wangjuan on 2017/6/15.
+ * update v1.1.1 增加世界杯活动右侧按钮入口、APP3.0 QR code.
+ * update v1.1.2:update APP3.0 QR code add UTM.
+ */
+var headerJs = function () {
+    var language = publicJs.language();
+    var uuid = $.cookie('uuid');
+    var localTracking = function(){
+		var t = DW5.DW5TYPE().type;
+        var local = "首页";
+		switch(t){
+			case "0": local = "首页";break;
+			case "1": local = "新闻";break;
+			case "2": local = "经济";break;
+			case "3": local = "人文";break;
+			case "4": local = "对话";break;
+			case "5": local = "普通内文";break;
+			case "6": local = "图集内文";break;
+			case "7": local = "多维客首页";break;
+			case "8": local = "多维客内文";break;
+		}
+		return local;
+    };
+    var a = function () {
+        var a = new Array;
+        a.push('<!--一些公共样式-->');
+        a.push('<style>/*placehoder*/:-moz-placeholder{/* Mozilla Firefox 4 to 18 */color: #ddd; opacity:1;}::-moz-placeholder {/* Mozilla Firefox 19+ */ color: #ddd;opacity:1;}input:-ms-input-placeholder{color:#ddd;opacity:1;}input::-webkit-input-placeholder{color: #ddd;opacity:1;}@media (max-width: 1440px) {.nav-fix-bg .navTopic,.nav .navTopic{display:none;}}</style>');
+        a.push('<!--右侧悬浮样式-->');
+        a.push('<style>.floatbar .barbox{right:59px;-moz-box-sizing:content-box;-webkit-box-sizing: content-box;box-sizing:content-box;transition:all 0s ease 0s ;-moz-transition:all 0s ease 0s;-webkit-transition:all 0s ease 0s;-o-transition:all 0s ease 0s}.barbox .right-barbox a:focus,.barbox .right-barbox a:hover{color:#222;}.floatbar li.DW10{display:;}.floatbar li.DW10 img{margin:0;padding:0;width:100%;height:100%}</style>');
+        a.push('<!--头部-->');
+        a.push('<div class="topbox topPublic">');
+        a.push('<div class="header">');
+        a.push('<div class="logo"><a href="http://www.dwnews.com"><img src="http://s0.dwnews.net/v5/images/logo.png" width="100%"></a></div>');
+        // a.push('<div class="logo" style="width:220px;height:120px"><a href="http://www.dwnews.com/"><img src="http://s0.dwnews.net/v5/images/festival/logo-dragonboat.png" width="100%"></a></div>');
+        a.push('<!--搜索区域-->');
+        a.push('<div class="top-scbox">');
+        a.push('<div class="top-sc-text"><a href="javascript:;" class="denglu">' + language.loginTijiao + '</a><span>|</span><a href="javascript:;" class="zhuce">' + language.regist + '</a><span>|</span><a href="https://duoweicn.dwnews.com" class="yk" target="_blank">' + language.monthly + '</a><span>|</span><a class="contact" href="http://www.dwnews.com/contactus.html">' + language.contact + '</a></div>');
+        a.push('<div class="top-sc-ico"><ul><li><a href="http://blog.dwnews.com/epaper/index.html" target="_blank"><img class ="dw_dianzibao" src="http://s3.dwnews.net/v5/images/top-ico05.png"></a></li><li><a href="http://www.dwnews.com/mobile/ios" target="_blank"><img class ="dw_appDownload" src="http://s3.dwnews.net/v5/images/top-ico04.png"></a></li><li><a href="https://twitter.com/DwnewsDWnews" target="_blank"><img class="" src="http://s3.dwnews.net/v5/images/top-ico03.png" /></a></li><li><a href="https://www.facebook.com/DuoWeiNews/" target="_blank"><img src="http://s3.dwnews.net/v5/images/top-ico02.png"></a></li><li><a href="javascript:;"><img class="dw5_fanjian" src="http://s3.dwnews.net/v5/images/top-ico01.png"></a></li></ul></div>');
+        a.push('<div class="top-sc">');
+        a.push('<form action="http://www.dwnews.com/search.html" method="get" target="_blank">');
+        a.push('<input type="text" name="q" class="inp01" value="" placeholder="' + language.search + '..." style="color: #666" /> <input name="" type="button" class="inp02" />');
+        a.push('<input type="hidden" name="domains" value="dwnews.com;chinesenewsnet.com" />');
+        a.push('<input type="hidden" name="sitesearch" value="dwnews.com" />');
+        a.push('<input type="hidden" name="client" value="pub-5895419964522249" />');
+        a.push('<input type="hidden" name="ie" value="utf-8" />');
+        a.push('<input type="hidden" name="oe" value="utf-8" />');
+        a.push('<input type="hidden" name="cof" value="GALT:#008000;GL:1;DIV:#336699;VLC:663399;AH:center;BGC:FFFFFF;LBGC:FFFFFF;ALC:0000FF;LC:0000FF;T:000000;GFNT:0000FF;GIMP:0000FF;LH:50;LW:185;L:http://www.chinesemedianet.com/images/logo.gif;S:http://www.dwnews.com;FORID:11" />');
+        a.push('<a class="f-search-btn" href="javascript:;"></a>');
+        a.push("</form>");
+        a.push('</div>');
+        a.push('</div>');
+        a.push('<!--搜索区域end-->');
+        a.push('</div>');
+        a.push('<!--导航-->');
+        a.push('<div class="nav-bg">');
+        a.push('<div class="nav">');
+        a.push('<ul>');
+        for (var i = 0; i < language.navagition.length; i++) {
+            var navTopic,mixpanel;
+            var tar = language.navagition[i].default == "default" ? "" : " target=\"_blank\"";
+            if(language.navagition[i].default == "default"||language.navagition[i].showTitle.indexOf("多维月刊")>-1||language.navagition[i].showTitle.indexOf("多維月刊")>-1){
+                navTopic="";mixpanel=" mixpanel.track=\""+language.navagition[i].showTitle+"\"";
+            }else{
+                navTopic ="navTopic";mixpanel="";
+            }
+            a.push('<li class=' + navTopic + '><span>|</span><a ' + mixpanel + tar + ' href="' + language.navagition[i].url + '">' + language.navagition[i].showTitle + '</a></li>');
+        }
+        a.push('</ul>');
+        a.push('</div>');
+        a.push('</div>');
+        a.push('<!--导航end-->');
+        a.push('</div>');
+        a.push('<!--头部end-->');
+        a.push('<!--头部导航条跟随-->');
+        a.push('<style>.nav-fix-bg{z-index:999999;}@media (max-width: 1050px) {.header-s{z-index: 999999;}}</style>');
+        a.push('<div class="nav-fix-bg" style="display: none;top:0;left:0;">');
+        a.push('<div class="nav-fixbox">');
+        a.push('<div class="nav-logo"><a href="http://www.dwnews.com"><img src="http://s3.dwnews.net/v5/images/logo-s.png" ></a></div>');
+        a.push('<div class="nav-ul">');
+        a.push('<ul>');
+        for (var i = 0; i < language.navagition.length; i++) {
+            var navTopic,mixpanel;
+            var tar = language.navagition[i].default == "default" ? "" : " target=\"_blank\"";
+            if(language.navagition[i].default == "default"||language.navagition[i].showTitle.indexOf("多维月刊")>-1||language.navagition[i].showTitle.indexOf("多維月刊")>-1){
+                navTopic="";mixpanel=" mixpanel.track=\""+language.navagition[i].showTitle+"\"";
+            }else{
+                navTopic ="navTopic";mixpanel="";
+            }
+            a.push('<li class=' + navTopic + '><span>|</span><a '+ mixpanel + tar + ' href="' + language.navagition[i].url + '">' + language.navagition[i].showTitle + '</a></li>');
+        }
+        a.push('</ul>');
+        a.push('</div>');
+        a.push('<div class="nav-icobox">');
+        a.push('<ul>');
+        a.push('<li class="dl"><a href="javascript:;">&nbsp;</a></li>');
+        a.push('<li class="ss"><div class="yinxing" style="width: 100px;height: 13px;position: absolute;right: -1px;bottom: -16px;"></div><div class="nav-ssbox" style="display:none">');
+        a.push('<form action="http://www.dwnews.com/search.html" method="get" target="_blank">');
+        a.push('<input type="text" name="q" class="left" value="" placeholder="' + language.search + '..." style="color: #666"><input name="" type="button" class="right">');
+        a.push('<input type="hidden" name="domains" value="dwnews.com" />');
+        a.push('<input type="hidden" name="sitesearch" value="dwnews.com" />');
+        a.push('<input type="hidden" name="client" value="pub-5895419964522249" />');
+        a.push('<input type="hidden" name="ie" value="utf-8" />');
+        a.push('<input type="hidden" name="oe" value="utf-8" />');
+        a.push('<input type="hidden" name="cof" value="GALT:#008000;GL:1;DIV:#336699;VLC:663399;AH:center;BGC:FFFFFF;LBGC:FFFFFF;ALC:0000FF;LC:0000FF;T:000000;GFNT:0000FF;GIMP:0000FF;LH:50;LW:185;S:http://www.dwnews.com;FORID:11" />');
+        a.push('<a class="f-search-btn" href="javascript:;"></a>');
+        a.push("</form>");
+        a.push('</div><a href="javascript:;">&nbsp;</a></li>');
+        a.push('<li><a href="javascript:;" class="dw5_fanjian">' + language.type + '</a></li>');
+        a.push('</ul>');
+        a.push('</div>');
+        a.push('</div>');
+        a.push('</div>');
+        a.push('<!--导航条跟随end-->');
+        a.push('<!--头部小屏-->');
+        a.push('<div class="header-s">');
+        a.push('<div class="logo-s"><a href="http://www.dwnews.com/"><img src="http://s3.dwnews.net/v5/images/logo.png" width="100%"></a></div>');
+        a.push('<div class="top-menu"><a href="javascript:;"><img src="http://s3.dwnews.net/v5/images/ico-menu.png"></a></div>');
+        a.push('<!--小屏导航模块-->');
+        a.push('<div class="top-menu-box" style="display:none;">');
+        a.push('<h3>' + language.pindao + '</h3>');
+        a.push('<ul class="menu-my">');
+        for (var i = 0; i < language.navagition.length; i++) {
+            var tar = language.navagition[i].default == "default" ? "" : " target=\"_blank\"";
+            var mixpanel;
+            if(language.navagition[i].default == "default"||language.navagition[i].showTitle.indexOf("多维月刊")>-1||language.navagition[i].showTitle.indexOf("多維月刊")>-1){
+               mixpanel=" mixpanel.track=\""+language.navagition[i].showTitle+"\"";
+            }else{
+                mixpanel="";
+            }
+            a.push('<li><a '+ mixpanel + tar + ' href="' + language.navagition[i].url + '">' + language.navagition[i].showTitle + '</a></li>');
+        }
+        a.push('<div class="clear"></div>');
+        a.push('</ul>');
+        a.push('<h4>' + language.qita + '</h4>');
+        a.push('<ul class="menu-qt">');
+        a.push('<li><a class="contact" href="http://www.dwnews.com/contactus.html" target="_blank">' + language.contact + '</a></li>');
+        a.push('<li class="headPublish"><a href="javascript:;">' + language.tougao + '</a></li>');
+        a.push('<li><a href="http://www.dwnews.com/mobile/ios/" target="_blank">' + language.kehu + '</a></li>');
+        a.push(' <div class="clear"></div>');
+        a.push('</ul>');
+        a.push('<div class="top-mn-sq"><a href="javascript:;">&nbsp;</a></div> </div>');
+        a.push('<!--小屏导航模块end-->');
+        a.push('</div>');
+        a.push('<!--头部小屏end-->');
+        a.push('<!--返回顶部滑块-->');
+        a.push('<div class="floatbar" style="height:260px;">');
+        a.push('<ul>');
+        // a.push('<li class="DW10"><a href="http://www.dwnews.com/2018dw10/photo/?utm_medium='+localTracking()+'&utm_source=右侧跟随&utm_campaign=非凡视界" target="_blank"><img src="http://s2.dwnews.net/v5/images/2018dw10/photo/photo.gif"></a></li>');
+        a.push('<li class="fk" style="text-align:center; font:normal 16px/20px Microsoft Yahei; padding-top:10px;color:#fff"><a style="color:#fff" href="javascript:;">' + language.fankui[0] + '</a></li>');
+        a.push('<li class="QRCode"><img src="http://s3.dwnews.net/v5/images/bar-ewm.png"></li>');
+        a.push('<li class="tg headPublish"><a href="javascript:;"><img src="http://s3.dwnews.net/v5/images/bar-tg.png"><p>' + language.yidong[10] + '</p></a></li>');
+        a.push('<li class="goBack" style="display: none;"><img src="http://s3.dwnews.net/v5/images/bar-top.png"></li>');
+        a.push('</ul>');
+        a.push('<div class="bar-box" style="display: none;">');
+        a.push('<div class="barbox">');
+        a.push('<div class="yinxing1" style="width:6px;height:100%;position:absolute;top:0;right:0;background: #fff"></div>');
+        a.push('<div class="left-barbox">');
+        a.push('<dl>');
+        a.push('<dd class="hover"><a href="javascript:;">' + language.yidong[0] + '</a></dd>');
+        a.push('<dd><a href="javascript:;">' + language.yidong[1] + '</a></dd>');
+        a.push('<dd><a href="javascript:;">' + language.yidong[2] + '</a></dd>');
+        a.push('<dd><a href="javascript:;">Facebook</a></dd>');
+        a.push('<dd><a href="javascript:;">' + language.yidong[3] + '</a></dd>');
+        a.push('</dl>');
+        a.push('</div>');
+        a.push('<div class="right-barbox"><p>' + language.yidong[4] + '</p><div class="ewbox"><img src="http://s1.dwnews.net/v5/images/QRcode/floatIOSApp3.0QRcode.png">' + language.yidong[0] + '</div></div>');
+        a.push('<div class="right-barbox none"><p>' + language.yidong[5] + '</p><div class="ewbox"> <img src="http://s1.dwnews.net/v5/images/QRcode/floatAndroidApp3.0QRcode.png">' + language.yidong[1] + '</div></div>');
+        a.push('<div class="right-barbox none"><p>' + language.yidong[6] + '</p><div class="ewbox"> <img src="http://s3.dwnews.net/v5/images/m-ewm-ipad-cn.png">' + language.yidong[7] + '</div></div>');
+        a.push('<div class="right-barbox none"> <p>' + language.yidong[8] + '</p> <div class="fbbox"><!--facebook--><div id="fb-root"></div> <script>(function(d, s, id) {var js, fjs = d.getElementsByTagName(s)[0];if (d.getElementById(id)) return;js = d.createElement(s); js.id = id;js.src = "https://connect.facebook.net/zh_CN/sdk.js#xfbml=1&appId=132168153464138&version=v2.3";fjs.parentNode.insertBefore(js, fjs);}(document, "script", "facebook-jssdk"));</script><div class="fb-page" data-href="https://www.facebook.com/DuoWeiNews?fref=ts" data-tabs="timeline" data-width="338" data-height="210" data-small-header="false" data-adapt-container-width="true" data-hide-cover="false" data-show-facepile="true"><blockquote cite="https://www.facebook.com/DuoWeiNews?fref=ts" class="fb-xfbml-parse-ignore"><a href="https://www.facebook.com/DuoWeiNews?fref=ts">多维新闻</a></blockquote></div><!--end--></div> </div>');
+        a.push('<div class="right-barbox none"><p class="cnt">' + language.yidong[9] + '</p><div class="ewbox1"><img src="http://s3.dwnews.net/v5/images/ewm-weixin.png"></div></div>');
+        a.push('</div>');
+        a.push('</div>');
+        a.push('</div>');
+        a.push('<!--反馈建议弹窗-->');
+        a.push('<div class="fkyy" style="display: none;width:100%;height:100%;position:fixed;background-color: rgba(0,0,0,0.5);left:0;top:0;z-index:999999">');
+        a.push('<div class="fk-box" style="width:590px; height:408px; background:#fff; border-radius:4px; margin:0 auto; position:relative; display: none;left:50%;top:50%;">');
+        a.push('<a href="javascript:;" class="close"style="position: absolute; right:25px;top:25px; width:30px; height:30px; background:url(http://s0.dwnews.net/v5/images/cent-cha.png) no-repeat top 0 left 0; " >&nbsp;</a>');
+        a.push('<div class="fksr" style="width:500px; margin:0 auto; padding-top:70px; position:relative;">');
+        a.push('<div class="xxbj"style="width:10px; height:20px; position:absolute; left:-15px; top:70px; color:#f00">*</div>');
+        a.push('<textarea name="message" cols="" rows="" placeholder="' + language.fankui[1] + '"style="width:100%; height:220px; padding:8px; font-size:16px; border:1px solid #ddd; margin-bottom:10px;"></textarea>');
+        a.push('<input class="btn" type="button" value="提交" style="float:left;margin-right:20px;width:160px; height:50px; text-align:center; font-size:18px; line-height:48px; color:#fff; background:#ff5f12; border:none; border-radius:4px; cursor:pointer;">');
+        a.push('<span style="color:#fc4343;font-size:16px;display:none;">' + language.fankui[2] + '</span>');
+        a.push('<a href="mailto" id="send"></a>');
+        a.push('</div>');
+        a.push('</div>');
+        a.push('</div>');
+        a.push('<!--返回顶部滑块end-->');
+        return a.join("")
+    };
+    var b = function (a) {
+        document.write(a);
+        document.close()
+    };
+    function win_open(url) {
+        window.location.href = url
+    };
+    /*需要调整 判断导航哪个变颜色*/
+    function navFn(parent) {
+        $("" + parent + " li").removeClass("hover");
+        $("" + parent + " li a").each(function (i) {
+            var currnt;
+            if (i < 7) {
+                currnt = $(this).attr("href").split("/")[2];
+                if ((location.href.indexOf(currnt) > -1 && location.href.indexOf("topic") < 0 && location.href.indexOf("photo") < 0)||currnt =="duoweicn.dwnews.com") {
+                    $(this).parent().addClass("hover")
+                }
+            } else {
+                currnt = $(this).attr("href");
+                if (location.href.indexOf(currnt) > -1 && location.href.indexOf("photo") < 0) {
+                    $(this).parent().addClass("hover")
+                }
+            }
+        })
+    }
+    return {
+        loadHtml: function () {
+            var c = a();
+            b(c);
+            //$.getScript('//s3.dwnews.net/v5/js/dw.2019festival.min.js'); 
+        },
+        fankui: function () {
+            if ($(window).width() <= 1033) {
+                $(".fk").css("display", "none");
+                $(".fk-box").css({ "width": "320px", "height": "308px" });
+                $(".fk-box .close").css({ "right": "20px", "top": "20px", "z-index": "2" });
+                $(".fk-box .fksr").css({ "width": "280px", "padding-top": "60px", "z-index": "1" });
+                $(".fk-box .fksr textarea").css({ "width": "100%", "height": "120px", "font-size": "14px" });
+                $(".fk-box .fksr input").css({ "width": "120px", "height": "40px", "font-size": "16px", "line-height": "38px" });
+                $(".fk-box .fksr .xxbj").css({ "width": "10px", "height": "20px", "left": "-15px", "top": "60px" });
+
+            } else {
+                $(".fk").css("display", "block");
+                $(".fk-box").css({ "width": "590px", "height": "408px" });
+                $(".fk-box .close").css({ "right": "25px", "top": "25px", "z-index": "2" });
+                $(".fk-box .fksr").css({ "width": "500px", "padding-top": "70px", "z-index": "1" });
+                $(".fk-box .fksr textarea").css({ "width": "100%", "height": "220px", "font-size": "16px" });
+                $(".fk-box .fksr input").css({ "width": "160px", "height": "50px", "font-size": "18px", "line-height": "48px" });
+                $(".fk-box .fksr .xxbj").css({ "width": "10px", "height": "20px", "left": "-15px", "top": "70px" });
+            }
+        },
+        common: function () {
+            var host = window.location.host;
+            var obj = $(".dw5_fanjian");
+            if ('//' + host == dwnews.dw5_blog) {
+                $('.header .dw5_fanjian').hide();
+                $('.footer-bg .dw5_fanjian').hide();
+                $('.fx-fixed .dw5_fanjian').parents('li').remove();
+                $('.nav-icobox ul>li').eq(2).remove();
+            }
+            if (location.href.indexOf("big5") > -1) {
+                $(".contact").attr("href", "http://www.dwnews.com/big5/contactus.html");
+                $(".logo>a").attr("href", "http://www.dwnews.com/big5/index.html");
+                $(".nav-logo>a").attr("href", "http://www.dwnews.com/big5/index.html");
+                $(".logo-s>a").attr("href", "http://www.dwnews.com/big5/index.html");
+                $(".top-sc form").attr("action", "http://www.dwnews.com/big5/search.html");
+                $(".nav-ssbox form").attr("action", "http://www.dwnews.com/big5/search.html");
+                $(".fx-sc form").attr("action", "http://www.dwnews.com/big5/search.html");
+                $(".footer>ul>li").eq(0).find('dl dd a').eq(0).attr("href", "http://www.dwnews.com/big5/emarketing.html");
+                $(".footer>ul>li").eq(0).find('dl dd a').eq(1).attr("href", "http://www.dwnews.com/big5/mediakit.html");
+                $(".footer>ul>li").eq(0).find('dl dd a').eq(2).attr("href", "http://www.dwnews.com/big5/audience.html");
+                $(".footer>ul>li").eq(0).find('dl dd a').eq(3).attr("href", "http://www.dwnews.com/big5/partnership.html");
+                $(".footer>ul>li").eq(2).find('dl dd a').eq(0).attr("href", "http://www.dwnews.com/big5/careers.html");
+                $(".footer>ul>li").eq(2).find('dl dd a').eq(1).attr("href", "http://www.dwnews.com/big5/contactus.html");
+                $(".footer>ul>li").eq(3).find('dl dd a').eq(0).attr("href", "http://www.dwnews.com/big5/copyright.html");
+                $(".footer>ul>li").eq(3).find('dl dd a').eq(1).attr("href", "http://www.dwnews.com/big5/privacy.html");
+                $(".footer>ul>li").eq(3).find('dl dd a').eq(2).attr("href", "http://www.dwnews.com/big5/disclaimer.html");
+            } else {
+                $(".contact").attr("href", "http://www.dwnews.com/contactus.html");
+                $(".logo>a").attr("href", "http://www.dwnews.com/");
+                $(".nav-logo>a").attr("href", "http://www.dwnews.com/");
+                $(".logo-s>a").attr("href", "http://www.dwnews.com/");
+                $(".top-sc form").attr("action", "http://www.dwnews.com/search.html");
+                $(".nav-ssbox form").attr("action", "http://www.dwnews.com/search.html");
+                $(".fx-sc form").attr("action", "http://www.dwnews.com/search.html");
+                $(".footer>ul>li").eq(0).find('dl dd a').eq(0).attr("href", "http://www.dwnews.com/emarketing.html");
+                $(".footer>ul>li").eq(0).find('dl dd a').eq(1).attr("href", "http://www.dwnews.com/mediakit.html");
+                $(".footer>ul>li").eq(0).find('dl dd a').eq(2).attr("href", "http://www.dwnews.com/audience.html");
+                $(".footer>ul>li").eq(0).find('dl dd a').eq(3).attr("href", "http://www.dwnews.com/partnership.html");
+                $(".footer>ul>li").eq(2).find('dl dd a').eq(0).attr("href", "http://www.dwnews.com/careers.html");
+                $(".footer>ul>li").eq(2).find('dl dd a').eq(1).attr("href", "http://www.dwnews.com/contactus.html");
+                $(".footer>ul>li").eq(3).find('dl dd a').eq(0).attr("href", "http://www.dwnews.com/copyright.html");
+                $(".footer>ul>li").eq(3).find('dl dd a').eq(1).attr("href", "http://www.dwnews.com/privacy.html");
+                $(".footer>ul>li").eq(3).find('dl dd a').eq(2).attr("href", "http://www.dwnews.com/disclaimer.html");
+            };
+            $(".floatbar .QRCode,.floatbar .QRCode img,.floatbar .bar-box").mouseenter(function () {
+                $(".floatbar .bar-box").show();
+            })
+            $(".floatbar .QRCode,.floatbar .bar-box").mouseleave(function () {
+                $(".floatbar .bar-box").hide();
+            })
+            $(".barbox .left-barbox dd").each(function (i) {
+                $(this).hover(function () {
+                    $(".barbox .left-barbox dd").removeClass("hover");
+                    $(this).addClass("hover");
+                    $(".barbox .right-barbox").addClass("none")
+                    $(".barbox .right-barbox").eq(i).removeClass("none")
+                })
+            });
+            navFn(".nav");
+            navFn(".nav-ul");
+            //点击反馈意见
+            $(".fk-box").css({ "margin-left": -$(".fk-box").width() / 2, "margin-top": -$(".fk-box").height() / 2 });
+            $(".floatbar .fk").click(function () {
+                $(".fkyy,.fk-box").css({ "display": "block" });
+                $("[name='message']").val("")
+            });
+            $(".fk-box a").click(function () {
+                $(".fkyy,.fk-box,.fksr span").css({ "display": "none" });
+            }).mouseover(function () {
+                $(this).css({ "background": "url(http://s0.dwnews.net/v5/images/cent-cha.png) no-repeat top -25px left 0" })
+            }).mouseout(function () {
+                $(this).css({ "background": "url(http://s0.dwnews.net/v5/images/cent-cha.png) no-repeat top 0 left 0" })
+            });
+            function sendEmail() {
+                var message = $("[name='message']").val(),
+                    body = "Message:" + "%0a%0d" + message;
+                $("#send").attr("href", "mailto:newsdesk@dwnews.com?body=" + body);
+                document.getElementById("send").click();
+            }
+            $(".btn").click(function () {
+                if ($(".fksr textarea").val().length < 10) {
+                    $(".fksr span").css({ "display": "block" });
+                    $(".fksr textarea").focus()
+                } else {
+                    sendEmail()
+                }
+            });
+            $(window).resize(function () {
+                headerJs.fankui();
+                $(".fk-box").css({ "margin-left": -$(".fk-box").width() / 2, "margin-top": -$(".fk-box").height() / 2 });
+            })
+            //当滚动条的位置处于距顶部200像素以下时，跳转链接出现，导航吸顶，否则消失
+            $(window).on('scroll', publicJs.goBack);
+            //当点击回到顶部，回到页面顶部位置
+            $(".floatbar .goBack").click(function () {
+                $('body,html').animate({ scrollTop: 0 }, 300);
+                return false;
+            });
+            $(".headPublish").click(function () {
+                //var that=this;
+                if ($.cookie('dwUid') && $.cookie('dwUsername')) {
+                    if (commonJs.registerData.regex[0].test($.cookie('dwEmail'))) {
+                        /*=======================================*/
+                        window.open("" + dwnews.dw5_blog + "/index.php?r=article%2Fpublish");
+                        /*if($(that).find("a").attr("href")=="javascript:;"){
+                         $(that).find("a").attr("href",""+dwnews.dw5_blog+"/index.php?r=article%2Fpublish");
+                         $(that).find("a")[0].click();
+                         }*/
+                        /*=======================================*/
+                    } else {
+                        var c = new Layer();
+                        c.loadLayer("" + language.complete + "！", '.bindmain');
+                        publicJs.bdReg(".cent-ts", ".centBox");
+                    }
+                } else {
+                    commonJs.loginLayer();
+                }
+            })
+            $(".nav-icobox .ss").mouseenter(function (event) {
+                $(".ss .nav-ssbox ").show(0);
+                event.stopPropagation();
+                return false;
+            });
+            $(".nav-icobox .ss").mouseleave(function (event) {
+                $(".ss .nav-ssbox ").hide(0);
+                event.stopPropagation();
+                return false;
+            });
+            $(".header-s .top-menu").click(function () {
+                $(".header-s .top-menu-box").css("paddingBottom", "20px")
+                $(".top-menu-box .top-mn-sq").slideDown(500);
+                $(".menu-qt").slideDown(500);
+                $(".menu-my").slideDown(500);
+                $(".top-menu-box h3,.top-menu-box h4").slideDown(500);
+            });
+            $(".top-menu-box .top-mn-sq").click(function () {
+                $(".header-s .top-menu-box").css("paddingBottom", 0);
+                $(this).slideUp(500);
+                $(".menu-qt").slideUp(500);
+                $(".menu-my").slideUp(500);
+                $(".top-menu-box h3,.top-menu-box h4").slideUp(500);
+            });
+            //导航翻转效果
+            // $(".nav>ul>li").eq(1).addClass("fangda");
+            // $(".fangda").css("position", "relative");
+            // $(".fangda>a").css({ color: "#ff5f12" });//改变字体颜色
+            // $(".fangda").append('<a target="_blank" href="' + language.navagition[1].url + '" style="position: absolute;left:42px;top:0;color:#ff5f12">' + language.navagition[1].showTitle + '</a>');
+            /*$(".zuoyou").css("position","relative");
+             $(".zuoyou").append('<a href="'+language.navagition[1].url+'" style="position: absolute;left:44px;top:0">'+language.navagition[1].showTitle+'</a>');
+             $(".fanzhuan").css("position","relative");
+             $(".fanzhuan").append('<a href="'+language.navagition[1].url+'" style="position: absolute;right:0">'+language.navagition[1].showTitle+'</a>');*/
+            // var timer = setInterval(function () {
+            //     if ($(".nav>ul>li>a").eq(1).hasClass("is-hidden")) {
+            //         $(".nav>ul>li>a").eq(1).addClass("is-visible").removeClass("is-hidden")
+            //         $(".nav>ul>li>a").eq(2).addClass("is-hidden").removeClass("is-visible")
+            //     } else {
+            //         $(".nav>ul>li>a").eq(1).addClass("is-hidden").removeClass("is-visible")
+            //         $(".nav>ul>li>a").eq(2).addClass("is-visible").removeClass("is-hidden")
+            //     }
+            // }, 2000)
+        }
+    }
+}();
+if (!(navigator.userAgent.indexOf("dw_news_app_ios") > -1 || navigator.userAgent.indexOf("dw_news_app_android") > -1)) {
+    headerJs.loadHtml();
+    headerJs.fankui();
+}
+$(function () {
+    if (!(navigator.userAgent.indexOf("dw_news_app_ios") > -1 || navigator.userAgent.indexOf("dw_news_app_android") > -1)) {
+        headerJs.common();
+    }
+});
+/*opacity: 0;-webkit-transform-origin: 50% 100%;transform-origin: 50% 100%;-webkit-transform: rotateX(180deg);transform: rotateX(180deg);*/

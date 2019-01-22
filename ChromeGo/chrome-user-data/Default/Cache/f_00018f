@@ -1,0 +1,439 @@
+/**
+ * Created by wangjuan on 2017/5/16.
+ */
+var language;
+if(location.href.split("&")[0].indexOf("big5")<0){
+    language=lang['zh-cn'];
+}else{
+    language=lang['zh-tw'];
+}
+var publicJs = function () {
+    function search(parent,ele){
+        $(parent).find("form").submit(function () {
+            var a = $(ele).val();
+            if (language.key == $.trim(a)) {
+                layer.msg(language.key+"！",{icon: 0});
+                return false;
+            }
+            //pv.dwgsch("j1", a);
+            DW5.SEARCH(a);//点击搜索发送，keyword=搜索关键字
+        });
+        $(parent).find("form").submit();
+    };
+    function centerNick(parent,n,ele,nickUid){
+        nickUid=nickUid||"";
+        ele.removeClass("regisWornning regisSuccess");
+        commonJs.registerStyle(parent, commonJs.registerData.regex[1].test(ele.val()),n,1,commonJs.registerData.centerNickname);
+        if(ele.hasClass("regisSuccess")){
+            $.getJSON("http://user-login-api.dwnews.com/index.php?r=login/checkName&callback=?",{"username":ele.val(),"uid":nickUid},function(data){
+                if(!data.flg){
+                    commonJs.registerStyle(parent,data.flg,n,1,commonJs.registerData.ajaxTex);
+                }
+            });
+        }
+    }
+    return {
+        dwkerPage:0,
+        loadPublic:function(){
+            $("body").append('<script src="http://s4.dwnews.net/v5/js/common/dw5.center.bind.js"></script>');
+            $(".top-sc .inp02").click(function(){search('.top-sc','.top-sc .inp01')});
+            $(".nav-ssbox .right").click(function(){search('.nav-ssbox','.nav-ssbox .left')});
+            $(".fx-sc .inp02").click(function(){search('.fx-sc','.fx-sc .inp01')});
+            $(".fSearchBox .fSright").click(function(){search('.fSearchBox','.fSearchBox .fSleft')});
+
+			$(".bzico-ico,.tag-ico").css("display","none");
+			/*关注变未关注样式发生的变化*/
+            $(".yiqian").css({
+                color:"#ccc",
+                width: "76px",
+                height: "30px",
+                margin: "0 auto",
+                font: "normal 14px/30px Microsoft Yahei",
+                textAlign: "center",
+                border: "1px solid #ddd",
+            })
+            /*//当滚动条的位置处于距顶部200像素以下时，跳转链接出现，导航吸顶，否则消失
+            $(window).on('scroll',publicJs.goBack);*/
+        },
+        /*回到顶部方法*/
+        goBack:function() {
+            if($(".ad-ggb").css("display")=="block"){
+                var scrollSh=500;
+            }else{
+                var scrollSh=220;
+            };
+            if ($(window).scrollTop() > scrollSh) {
+                if($(document).width()>=1034){
+                    $(".nav-fix-bg").fadeIn(0);
+                }else{
+                    $(".nav-fix-bg").fadeOut(0);
+                }
+                $(".floatbar .goBack").fadeIn(500);
+
+            } else {
+                $(".floatbar .goBack").fadeOut(500);
+                $(".nav-fix-bg").css("display","none");
+            }
+        },
+        /*鼠标划上图片放大10%*/
+        extendPic:function(b) {
+            $(b).parent().css({"overflow": "hidden","display":"block"});
+            $(b).css({"transition": "all .3s ease-in-out","-webkit-transition": "all .3s ease-in-out"," -moz-transition": "all .3s ease-in-out"," -ms-transition": "all .3s ease-in-out","-webkit-transform-style": "preserve-3d","-webkit-backface-visibility": "hidden","-moz-backface-visibility": "hidden","-ms-backface-visibility": "hidden"
+            });
+            $(b).hover(function () {
+                $(this).css({"transform": "scale(1.1)","-webkit-transform": "scale(1.1)","-moz-transform": "scale(1.1)","-ms-transform": "scale(1.1)"
+                //"opacity": 0.8
+                })
+            }, function () {
+                $(this).css({"transform": "scale(1)","-webkit-transform": "scale(1)","-moz-transform": "scale(1)","-ms-transform": "scale(1)"
+                    //"opacity": 1
+                })
+            });
+        },
+        /*限制字符长度*/
+        titleLenth:function(str,n,omit){
+            var omit=omit||"";
+            var r=/[^\x00-\xff]/g;
+            if(str.replace(r,"mm").length<=n){return str;}
+            var m=Math.floor(n/2);
+            for(var i=m;i<str.length;i++){
+                if(str.substr(0,i).replace(r,"mm").length>=n){
+                    return str.substr(0,i)+omit;
+                }
+            }
+            return str;
+        },
+        /*完成某个动作后 打开新的页面*/
+        win_open:function(url){
+            window.location.href=url
+        },
+        bdReg:function(load,parent){
+            /*页面初始化 检测昵称是否可用*/
+            centerNick(".centBox",1,$(".bind-xx-box input.input-minoru").eq(1),$.cookie("dwUid"));
+            $(load).append(commonJs.registerData.loading);
+            /*邮箱验证*/
+            $(".cent-ts .bind1").bind('change', function () {
+                commonJs.email(parent,0,$(this),true)
+            });
+            /*昵称验证*/
+            $(".cent-ts .bind2").bind('change', function () {
+                centerNick(parent,1,$(this),$.cookie("dwUid"));
+            });
+            $(".cent-ts .bind3").bind('change', function () {
+                commonJs.passWord(parent,2,$(this));
+                if(!($(".bind4").val()=="")){
+                    commonJs.aginPass(parent,3,$(".bind4"),$(this))
+                }
+            });
+            $(".cent-ts .bind4").bind('change', function () {
+                commonJs.aginPass(parent,3,$(this),$(".bind3"))
+            });
+            /*验证绑定界面的输入框*/
+            $(".cent-ts .bind5").bind('change', function () {
+                $(this).removeClass("regisWornning regisSuccess");
+                commonJs.registerStyle(parent, commonJs.registerData.regex[0].test($(this).val()),4,0,commonJs.registerData.registerText);
+            });
+            /*密码*/
+            $(".cent-ts .bind6").bind('change', function () {
+                commonJs.passWord(parent,5,$(this))
+            });
+        },
+        /*关注方法*/
+        guanzhu:function (ele) {
+            //$(ele).parent().parent().append('<div class="loginLoading" style="background: rgba(255,255,255,0.3) url(\'http://s3.dwnews.net/v5/images/loading.gif\') center no-repeat;width:100%;text-align:center;line-height:80%;height:100%;position: absolute;left:0;top:0"></div>')
+            if($.cookie('dwUid')&&$.cookie('dwUsername')){
+                var that=ele;
+                $.ajax({
+                    url : ''+dwnews.dw5_blog+'/index.php?r=person/cancel_attention&callback=?',
+                    type : 'GET',
+                    data : {touid:$(that).attr("attention_id"),type:"guanz"},
+                    dataType : "jsonp",
+                    success : function(data) {
+                        if(data.stat=="success"||data.stat=="successed"){
+                            //$(ele).parent().parent().parents().find(".loginLoading").remove();
+                            if($(that).hasClass("qian")){
+                                layer.msg(""+data.msg+"",{icon: 1},function(){
+                                    $(that).removeClass("qian").addClass("yiqian");
+                                    $(".yiqian").css({width: "76px", height: "30px", margin: "0 auto", font: "normal 14px/30px Microsoft Yahei", textAlign: "center", border: "1px solid #ddd",}).find("a").css("color","#ccc").html(""+language.attentioned+"")
+                                });
+                            }else{
+                                layer.msg(""+data.msg+"",{icon: 1},function(){
+                                    $(that).removeClass("gz").addClass("ygz").html('<a href="javascript:;">'+language.attentioned+'</a>');
+                                });
+                            };
+                            if(data.stat=="success"){
+                                $.ajax({
+                                    url : ""+dwnews.dw5_blog+"/msg/sendmsg.php",
+                                    dataType:"jsonp",
+                                    data:{'type':'fans', 'to_uid':$(that).attr("attention_id"), 'from_uid':data.from_uid,},
+                                    type:"post",
+                                    jsonp:"jsonpcallback",
+                                    timeout: 5000,
+                                    success:function(data){}
+                                });
+                            }
+                    }else if(data.stat==2){
+                            //$(ele).parent().parent().find(".loginLoading").remove();
+                            var c = new Layer();
+                            c.loadLayer(""+language.complete+"！",'.bindmain');
+                            publicJs.bdReg(".cent-ts",".centBox");
+                        } else{
+                            //$(ele).parent().parent().find(".loginLoading").remove();
+                            layer.msg(data.msg,{icon: 0})
+                        }
+                    }
+                })
+            }else{
+                //$(ele).parent().parent().find(".loginLoading").remove();
+                commonJs.loginLayer();
+            }
+        },
+        checkLang:function(){
+            if(location.href.split("&")[0].indexOf("big5")<0){
+                return "zh-cn";
+            }else{
+                return "zh-tw";
+            }
+        },
+        language:function(){
+            return language=lang[publicJs.checkLang()];
+        },
+        change:function(url,appendid,type){
+            $.ajax({
+                url : dwnews.dw5_blog+url,
+                data : {page:publicJs.dwkerPage,type:type,t:new Date().getTime()},
+                dataType : "jsonp",
+                success : function(data) {
+                    $(".hyh").find("span").removeClass("spin");
+                    $(".dwk-bzc .loginLoading").css("display","none");
+                    if(data.stat=="success"){
+                        $(appendid).html(data.data);
+                    }else if(data.stat=="reset3"){
+                        $(appendid).html(data.data);
+                        publicJs.dwkerPage=-1;
+                    }else{
+                        $(appendid).html(data.data);
+                        publicJs.dwkerPage=0;
+                    }
+                },
+                error:function(){
+                    $(".dwk-bzc .loginLoading").css("display","none");
+                    layer.msg(language.overTime,{icon: 0});
+                    $(".hyh").find("span").removeClass("spin");
+                }
+            })
+        },
+        loadHref:function(type){
+            return type;
+        },
+        dwkerLike:function(){
+            $(".support a").attr("href","javascript:;");
+            $(".support.no .one").css({color: "#d8d8dd"});
+            $(document).on('click', '.support', function(){
+                var that=this;
+                $.ajax({
+                    url:""+dwnews.dw5_blog+"/index.php?r=profile/add_likes&callback=?",
+                    data:{id:$(this).attr("dataid"),uuid: $.cookie("uuid"),type:$(this).attr("datatype")},
+                    dataType: "jsonp",
+                    success:function(data){
+                        if(data.stat=="success"){
+                            $(that).find(".one").fadeIn(100).animate({bottom: "80px", opacity:0},800).fadeOut(0);
+                            $(that).find(".n").text(Number($(that).find(".n").text())+1);
+                        }else{
+                            layer.msg(data.msg,{icon: 0})
+                        }
+                    }
+                });
+            });
+            /*推荐博主关注  文章列表关注*/
+            $(".dwk-bzc ul,.dwk-bzc1 ul,.dwk-bata1 ul,.dwk-pbl .lisbox>ul").on("click", ".qian,.gz", function(){
+                publicJs.guanzhu(this);
+            });
+            /*首页中列 列表关注*/
+            $(".main-cent .cent").on("click",".gz", function(){
+                publicJs.guanzhu(this);
+            });
+            /*经济页面 右列关注*/
+            $(".eco-r .r-list").on("click",".gz", function(){
+                publicJs.guanzhu(this);
+            });
+            /*center页面关注按钮*/
+            $(".cent-top").on("click",".gz", function(){
+                publicJs.guanzhu(this);
+            });
+            /*会员中心*/
+            $(".huiyuan").click(function(){
+                if($.cookie('dwUid')&&$.cookie('dwUsername')){
+                    window.open(""+dwnews.dw5_blog+"/index.php?r=profile/index");
+                }else{
+                    commonJs.loginLayer();
+                }
+            })
+        }
+    }
+}();
+$(function () {
+    publicJs.loadPublic();
+    publicJs.dwkerLike();
+});
+/*加载更多 无限滚动*/
+/* 滚动Json*/
+function ScrollLoad(){
+    this.defaults = {
+        start:1,
+        appendid:null,
+        animate:"show",
+        succFn:null,
+        styleFn:null,
+        total:null,
+        channel:"",
+        type:null
+    };
+    this.ajx=null;
+};
+ScrollLoad.prototype.scollConfig = function(options){
+    var opts = jQuery.extend({},this.defaults, options);
+    if(opts.appendid == null || opts.appendid == '') {return false;}
+    this.defaults = opts;
+};
+ScrollLoad.prototype.lazyloadJson=function(){
+    var defaults = this.defaults;
+    this.ajx = ajaxLoad;
+    $(window).on('scroll',ajaxLoad);
+    function ajaxLoad(){
+        var parentLHeight=$(defaults.appendid).height()+$(defaults.appendid).offset().top;
+        if(parentLHeight<= $(window).scrollTop()+$(window).height()){
+            var url=dwnews.dw5_json+defaults.channel+encodeURI(defaults.type+"/list"+defaults.start+".json")+"?ts="+new Date().getTime();
+            //var url=encodeURI(defaults.type+"/list"+defaults.start+".json");
+            $(window).off('scroll', ajaxLoad);
+            $.ajax({
+                url:url,
+                dataType: "json",
+                success: function (data) {defaults.start+=1;
+                    $(defaults.appendid).append(defaults.succFn(data,defaults.type));
+                    if(defaults.type=="ecodwopinion/list"){
+                        $('.lazy_ecodwopinion').lazyload({effect: ""+defaults.animate+"",placeholder : "http://s3.dwnews.net/v5/images/unLoad.jpg",threshold:100});
+                    }else{
+                        $('.lazy_'+defaults.type+'').lazyload({effect: ""+defaults.animate+"",placeholder : "http://s3.dwnews.net/v5/images/unLoad.jpg",threshold:100});
+                    }
+                },
+                complete:function(data){
+                    defaults.styleFn();
+                    parentLHeight=$(defaults.appendid).height()+$(defaults.appendid).offset().top;
+                    if(defaults.total==null){var icount=data[0].total;}else{var icount=defaults.total;}
+                    if(defaults.start>icount){$(window).off('scroll', ajaxLoad);$(defaults.appendid).parent().find(".jiaz").css("display","none")}else{$(window).on('scroll', ajaxLoad);}
+                },
+                error:function(){
+                    $(window).off('scroll', ajaxLoad);
+                }
+            });
+        }
+    };
+};
+/*无限加载 滚动Html*/
+function ScrollHtml(){
+    this.defaults = {
+        start:1,
+        appendid:null,
+        chennel:"",
+        styleFn:null,
+        type:"index",
+        catid:0,
+        animate:"fadeIn",
+        order:0
+    };
+    this.ajx=null;
+};
+ScrollHtml.prototype.scollConfig = function(options){
+    var opts = jQuery.extend({},this.defaults, options);
+    if(opts.appendid == null || opts.appendid == '') {return false;}
+    this.defaults = opts;
+};
+ScrollHtml.prototype.lazyloadHtml=function(){
+    var defaults = this.defaults;
+    this.ajx = ajaxLoad;
+    $(window).on('scroll',ajaxLoad);
+    var parentHeight = $(defaults.appendid).height() + $(defaults.appendid).offset().top;
+    if(defaults.type=="lists"){defaults.catid=list_type;};
+    $(window).resize(function(){parentHeight = $(defaults.appendid).height() + $(defaults.appendid).offset().top;})
+    function ajaxLoad(){
+        if(parentHeight<= $(window).scrollTop()+$(window).height()){
+            var url=defaults.chennel;
+            $(window).off('scroll', ajaxLoad);
+            $.ajax({
+                url:url,
+                //dataType: "jsonp",
+                data: {catid:defaults.catid,page:defaults.start,type:defaults.type,t:new Date().getTime(),order:defaults.order},
+                success: function (data) {
+                    $(defaults.appendid).append(data);
+                    $('.lazy').lazyload({effect: ""+defaults.animate+"",placeholder : "http://s0.dwnews.net/v5/images/unLoad.jpg",threshold:100});
+                    parentHeight = $(defaults.appendid).height() + $(defaults.appendid).offset().top;
+                    defaults.start+=1;
+                },
+                complete:function(data){
+                    defaults.styleFn();
+                    if(typeof(defaults.catid)=="undefined"){
+                        var icount=data[0].total
+                    }else{
+                        var total='icount_'+defaults.catid;
+                        var icount=eval(total)-1;
+                    }
+                    if(defaults.start>=icount){
+                        $(window).off('scroll', ajaxLoad);
+                        $(defaults.appendid).parent().find(".jiaz").css("display","none")
+                    }else{$(window).on('scroll', ajaxLoad)}
+                },
+                error:function(){
+                    $(window).off('scroll', ajaxLoad);
+                }
+            });
+        }
+    };
+};
+/*点击加载更多*/
+function LoadMore(){
+    this.defaults = {
+        start:1,
+        appendid:null,
+        clickEle:null,
+        animate:"show",
+        succFn:null,
+        styleFn:null,
+        total:undefined,
+        channel:"",
+        type:"",
+        moreBtn:null
+    };
+};
+LoadMore.prototype.scollConfig = function(options){
+    var opts = jQuery.extend({},this.defaults, options);
+    if(opts.appendid == null || opts.appendid == '') {return false;}
+    this.defaults = opts;
+};
+LoadMore.prototype.loadmoreJson=function(){
+    var defaults = this.defaults;
+    var url=encodeURI(defaults.channel+defaults.type+"/list"+defaults.start+".json");
+    var icount;
+    $.ajax({
+        url:url,
+        dataType: "json",
+        success: function (data) {
+            $(defaults.appendid).append(defaults.succFn(data,defaults.type));
+            $('.lazy_'+defaults.type+'').lazyload({effect: ""+defaults.animate+"",placeholder : "http://s3.dwnews.net/v5/images/unLoad.jpg",threshold:100});
+            if(defaults.total==null){icount=data[0].total;}else{icount=defaults.total;}
+            if(defaults.start>=icount-1){
+                //$(".loading_more").replaceWith('<div style="width: 30%;height: 56px;font: normal 18px/56px Microsoft Yahei;background: #eee;border-radius: 8px;text-align: center;margin: 0 auto;"><a href="javascript:;">'+language.nomore+'</a></div>');
+                $(".loading_more").replaceWith('<div class="'+defaults.moreBtn+'">'+language.nomore+'</div>');
+                //$(defaults.clickEle).unbind(".more");
+            }else{
+                $(".loading_more").replaceWith('<div class="'+defaults.moreBtn+'"><a href="javascript:;">查看更多</a></div>');
+            }
+        },
+        complete:function(){
+            defaults.styleFn();
+        },
+        error:function(){
+            layer.msg(language.overTime,{icon: 0})
+        }
+    });
+};

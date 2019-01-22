@@ -1,0 +1,15 @@
+2019/01/22-09:02:09.669 30c Reusing MANIFEST C:\Users\达内\Desktop\vpn\dowsDNS\chromego\ChromeGo\chrome-user-data\Default\Session Storage/MANIFEST-000001
+2019/01/22-09:02:09.680 30c Recovering log #21
+2019/01/22-09:02:09.707 30c Reusing old log C:\Users\达内\Desktop\vpn\dowsDNS\chromego\ChromeGo\chrome-user-data\Default\Session Storage/000021.log 
+2019/01/22-09:04:45.421 87c Level-0 table #25: started
+2019/01/22-09:04:45.479 87c Level-0 table #25: 29338 bytes OK
+2019/01/22-09:04:45.499 87c Delete type=0 #21
+2019/01/22-09:04:45.499 87c Compacting 4@0 + 1@1 files
+2019/01/22-09:04:45.655 87c Generated table #26@0: 216 keys, 25677 bytes
+2019/01/22-09:04:45.655 87c Compacted 4@0 + 1@1 files => 25677 bytes
+2019/01/22-09:04:45.687 87c compacted to: files[ 0 1 1 0 0 0 0 ]
+2019/01/22-09:04:45.688 87c Delete type=2 #16
+2019/01/22-09:04:45.688 87c Delete type=2 #18
+2019/01/22-09:04:45.688 87c Delete type=2 #20
+2019/01/22-09:04:45.689 87c Delete type=2 #22
+2019/01/22-09:04:45.689 87c Delete type=2 #25

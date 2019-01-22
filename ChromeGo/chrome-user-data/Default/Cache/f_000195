@@ -1,0 +1,1650 @@
+!(function(win, doc) {
+	var object = {};
+	var report = {};
+	function SDK(opt) {
+		this.opt = opt;
+	}
+	SDK.prototype._ajax = function(param, callback) {
+		if (typeof callback === 'function')
+			callback(param);
+	}
+	SDK.prototype._update = function(key, defaultParam) {
+		this[key] = function(param, callback) {
+			param = Object.assign({}, defaultParam, param);
+			this._ajax(param, callback);
+		}
+		return this;
+	};
+	SDK.prototype._remove = function(url) {
+		delete this[url];
+		return this;
+	};
+
+	// 主评论框
+	SDK.prototype.masterBox = function(param) {
+		
+		// $('#' + param.id).append(html);
+		// // 主评论区域class
+		// $('#' + param.id).addClass(param.bodyclass);
+		// 取表情信息
+		// JSsdk.GetEmoticon({
+		// 	api_url : param.PostApiUrl,
+		// 	CommentChannelArea :param.CommentChannelArea
+		// });
+		// 举报类型
+		JSsdk.ReportApi({
+			form_category_id:param.CommentFormCategoryId,
+			api_url : param.PostApiUrl
+		});
+		
+		// 发表评论
+		$('.comment-sub').bind('click', function() {
+			JSsdk.CommentPost({
+				'comment_url' : param.CommentUrl,
+				'comment_title' : param.CommentTitle,
+				'CommentFormCategoryId' :param.CommentFormCategoryId,
+			});
+		});
+		CommentUserID = GetUserComment();
+
+		// 循环生成主评论列表
+		JSsdk.CommentList({
+			id 			: param.id,
+			CommentList : param.CommentList,					//插入div class
+			type 		: 'list',                               //类型列表
+			data        : param.data.commentList,							
+			CommentChannelArea : param.CommentChannelArea,    	//1
+			CommentFormCategoryId:param.CommentFormCategoryId, 	//36
+			CommentUrl  : param.CommentUrl,      				//'9e59d215aba68abc16092266b87a272b'
+			CommentTitle: param.CommentTitle,  					//'习近平主席亚洲之行的6个感人细节'
+			PostApiUrl  : param.PostApiUrl,     				//'http://comment.api.dwnews.com/v1/api?'
+			CommentUserID:CommentUserID 						//1
+		});
+
+		// 循环生成热评列表
+		JSsdk.CommentList({
+			id 			: param.id,
+			type 		: 'hot',								//类型热门
+			CommentList : 'comments_listnew',					//插入div class
+			data        : param.data.hotList,
+			CommentChannelArea : param.CommentChannelArea,    	//1
+			CommentFormCategoryId:param.CommentFormCategoryId, 	//36
+			CommentUrl  : param.CommentUrl,      				//'9e59d215aba68abc16092266b87a272b'
+			CommentTitle: param.CommentTitle,  					//'习近平主席亚洲之行的6个感人细节'
+			PostApiUrl  : param.PostApiUrl,     				//'http://comment.api.dwnews.com/v1/api?'
+			CommentUserID:CommentUserID 						//1
+		});
+	};
+
+
+	// 主评论框
+	SDK.prototype.CommentList = function(param) {
+	
+		// 循环生成主评论列表
+		var d = param.data;
+		for (var i = 0; i < d.length; i++) {
+			// 评论框赋值
+			CommentUserID = GetUserComment();
+
+			if(d[i].children){
+				JSsdk.CommentBox({
+					id : param.id,
+					commentList 		: param.CommentList,
+					commentID 			: d[i].id,
+					type            	: param.type,					//类型 列表还是热评
+					commentUID 			: d[i].commentUserId,
+					commentArea 		: d[i].commentChannelArea,
+					support 			: d[i].support || 0,
+					dislike 			: d[i].dislike, 				//踩数
+					commentUp 			: d[i].commentUp, 				//顶数
+					commentTime 		: d[i].commentCreatedAt,
+					userNickname 		: d[i].username,   				//昵称
+					userimg 			: d[i].userimg,   				//头像
+					content 			: d[i].commentContent,
+					children 			: d[i].children,
+					supportUserFlg 		: d[i].supportUserFlg,
+					usermyurl 			: d[i].usermyurl,   			//url
+					dislikeUserFlg 		: d[i].dislikeUserFlg,
+					CommentChannelArea 	: param.CommentChannelArea,    	//1
+					CommentFormCategoryId:param.CommentFormCategoryId, 	//36
+					CommentUrl 			: param.CommentUrl,      		//'9e59d215aba68abc16092266b87a272b'
+					CommentTitle  		: param.CommentTitle,  			//'习近平主席亚洲之行的6个感人细节'
+					PostApiUrl 			: param.PostApiUrl,      		//'http://comment.api.dwnews.com/v1/api?'
+					CommentUserID 		: CommentUserID, 				//1
+					is_edit				: d[i].isEdit,
+					hoti				: i+1    						//第几个主评 用于记录热点评论头像
+				});
+			}else{
+
+				JSsdk.CommentBox({
+					id 				: param.id,
+					commentList 	: param.CommentList,
+					commentID 		: d[i].id,
+					type            : param.type,						//类型 列表还是热评
+					commentUID 		: d[i].commentUserId,
+					commentArea 	: d[i].commentChannelArea,
+					support 		: d[i].support || 0,
+					dislike 		: d[i].dislike, 					//踩数
+					commentUp 		: d[i].commentUp, 					//顶数
+					commentTime 	: d[i].commentCreatedAt,
+					userNickname 	: d[i].username,   					//昵称
+					userimg 		: d[i].userimg,   					//头像
+					content 		: d[i].commentContent,
+					supportUserFlg 	: d[i].supportUserFlg,
+					usermyurl 		: d[i].usermyurl,   				//url
+					dislikeUserFlg	: d[i].dislikeUserFlg,
+					CommentChannelArea 	:param.CommentChannelArea,    	//1
+					CommentFormCategoryId:param.CommentFormCategoryId, 	//36
+					CommentUrl 			:param.CommentUrl,      		//'9e59d215aba68abc16092266b87a272b'
+					CommentTitle 		:param.CommentTitle,  			//'习近平主席亚洲之行的6个感人细节'
+					PostApiUrl 			:param.PostApiUrl,      		//'http://comment.api.dwnews.com/v1/api?'
+					CommentUserID 		:CommentUserID ,				//1
+					is_edit				:d[i].isEdit,
+					hoti				:i+1    						//第几个主评 用于记录热点评论头像
+				});
+			}
+		}
+
+		// 展开举报删除编辑选项
+		$('.more_btn').unbind();
+		$('.more_btn').bind("click",function(){
+			var displayval = $(this).siblings('.more_content').css('display');
+			$('.more_content').css('display','none');
+			// 关闭回复框
+			$('.replyedit').remove();
+			if(displayval=='none'){
+				$(this).siblings('.more_content').css('display','block');
+			}
+            
+        })
+
+		// 评论中回复展开更多
+		$(".load_more_comment_little").unbind();
+		$(".load_more_comment_little").bind("click",function(){
+			var load_more_val = $(this).attr('datavalue');
+            $(".hideComment"+load_more_val).removeClass("hideComment");
+            $(".load_more_comment_"+load_more_val).css("display","none");
+        });
+
+		//次级回复
+		$('.sub_reply').unbind();
+		$('.sub_reply').bind('click', function() {
+			
+			if($(this).attr('canreply')==0){
+				layer.msg('该文章不允许回复评论！',{icon: 2});
+				return false;
+			}
+			// 关闭举报框
+			$('.more_content').css('display','none');
+			$('.replyedit').remove();
+			var commentId          = parseInt($(this).attr('data-quotepid')); 	//评论的id
+			var commentPId         = parseInt($(this).attr('data-replypid')); 	//回复的pid
+			var commentUId         = $(this).attr('data-quoteuid'); 			//评论的用户id
+			var comment_username   = $(this).attr('comment_user_name');			//评论人的用户名
+			var IsEdit             = $(this).attr('data-edit');	
+			var Comment_Content    = $('.content_'+commentId).html(); 			//评论内容
+			var originalcontent    = $('.content_'+commentId).html();;			//回复的原评论内容
+			var reply_id	   	   = $(this).attr('data-quotepid');
+			var reply_type         = $(this).attr('replytype'); 
+
+			CommentUserID = GetUserComment();
+
+			JSsdk.ReplyBox({
+				commentId  			: commentId,
+				commentPId 			: commentPId,
+				issub_reply			: 1,							//是否是次级回复 1是 0否
+				IsEdit  			: IsEdit,   					//是否是修改 1是修改 0是回复
+				comment_username 	: comment_username,
+				commentUId 			: commentUId,
+				type 				: true,
+				CommentChannelArea 	: param.CommentChannelArea,    	//1
+				CommentFormCategoryId:param.CommentFormCategoryId, 	//36
+				CommentUrl  		: param.CommentUrl,      		//'9e59d215aba68abc16092266b87a272b'
+				CommentTitle 		: param.CommentTitle,  	 		//'习近平主席亚洲之行的6个感人细节'
+				PostApiUrl 			: param.PostApiUrl,      		//'http://comment.api.dwnews.com/v1/api?'
+				CommentUserID 		: CommentUserID ,         		//1
+				Comment_Content		: Comment_Content,
+				reply_id 			: reply_id,		   		        //回复的pid
+				reply_type			: reply_type
+
+			});
+	    
+		});
+		
+		// 踩
+		$(".no_of_dislikes").unbind();
+		$(".no_of_dislikes").bind("click",function(){			
+			object.obj      = $(this);
+
+			// 踩
+			if($(this).hasClass("feedActived")==false){
+				var str             = $(this).text();
+				var commentId       = $(this).attr('data-quotepid');
+
+				CommentUserID  = GetUserComment();
+				JSsdk.Dislike({
+					PostApiUrl 			: param.PostApiUrl,
+					commentId 			: commentId,
+					CommentUserID 		: CommentUserID 
+				});
+				
+			}else{//取消踩
+				var str             = $(this).text();
+				var commentId       = $(this).attr('data-quotepid');
+				var originalcontent = $('.content_' + commentId).html();		//点赞的原评论内容
+
+				if(parseInt(str)<=0){
+					layer.msg('已取消！',{icon: 1});
+					return false;
+				}
+				CommentUserID = GetUserComment();
+
+				JSsdk.UnDislike({
+					PostApiUrl    		: param.PostApiUrl,
+					commentId 	  		: commentId,
+					CommentUserID 		: CommentUserID 
+				});
+			}
+		});
+
+		// 顶
+		$(".no_of_likes").unbind();
+		$(".no_of_likes").bind("click",function(){
+			object.obj    = $(this);
+			//顶
+			if($(this).hasClass("feedActived")==false){
+
+				commentId     = $(this).attr('data-quotepid');
+				CommentUserID = GetUserComment();
+				JSsdk.ThumbUp({
+					PostApiUrl 			: param.PostApiUrl,
+					commentId 			: commentId,
+					CommentUserID 		: CommentUserID 						//1
+				});
+
+			}else{
+				// 取消顶
+				commentId           = $(this).attr('data-quotepid');
+				var dnum            = parseInt( $(this).text());
+
+				if(dnum<=0){
+					layer.msg('顶已取消！',{icon: 1});
+					return false;
+				}
+				CommentUserID = GetUserComment();
+
+				JSsdk.UnThumbUp({
+					PostApiUrl 			: param.PostApiUrl,
+					commentId 			: commentId,
+					CommentUserID 		: CommentUserID 						//1
+				});
+			}
+		});
+		
+		//举报
+		$(".report").unbind();
+        $(".report").bind("click", function(){
+        	var commentId = parseInt($(this).attr('data-comid')); //评论id
+			$('#subreport_body').css('display','block');
+
+			//提交举报
+			$("#subreport").unbind();
+			$("#subreport").bind('click', function() {
+				var reportIdtype = $("#reporType").val();   //举报类型
+				var reportContent = $("#reportConn").val();  //举报原因
+				CommentUserID = GetUserComment();
+
+				if(reportIdtype==0 ){
+					alert('请填写举报类型！');
+					return false;
+				}
+
+				if( reportContent==''){
+					alert('请填写举报的具体内容！');
+					return false;
+				}
+
+				JSsdk.SubReport({
+					apiUrl 			: param.PostApiUrl, //接口url
+					commentId 		: commentId,  		//举报评论id
+					reportFromUid 	: CommentUserID, 	//举报用户uid 
+					reportContent 	: reportContent,   	//举报原因
+					reportIdtype 	: reportIdtype      //举报类型
+				});
+			});
+        })
+	};
+
+	SDK.prototype.ReportApi = function(param) {
+		ajax({
+			url : param.api_url, //请求地址
+			type : 'POST', 
+			data : {
+				'access_token' 	: access_token,
+				'form_category_id'	: param.form_category_id,
+				'do' 			: 'get_report_category'
+			},
+			dataType : 'json',
+			success : function(data, status, xhr) {
+				var dataArray = $.parseJSON(data);
+		        report = dataArray;
+		        var html = '';
+		        if(report){ 
+					for(var i in report){
+						html += '<option value="'+i+'">'+report[i].reportTypeTitle+'</option>';
+					}
+				}
+				$("#reporType").append(html);
+			},
+			Error : function(xhr, error, exception) {   
+				layer.msg(exception.toString(),{icon: 2});
+			}
+		});
+	};
+
+	// 发表评论方法
+	SDK.prototype.CommentPost = function(param) {
+		if(comment_block   == 0){
+			return false;
+		}                                                    //状态
+
+		var content = $('#publisharea').val();
+		if (content == null || content == ''|| content == undefined||$.trim(content.replace(/(^s*)|(s*$)/g, "").replace(/(&nbsp;)/g, "").replace(/<BR>/ig,"").replace(/<\/?p>/ig,"")).length==0) {
+			layer.msg('内容不能为空！',{icon: 2});
+			return false;
+		}
+
+		if(fourmComment==0){
+			layer.msg('该文章不可以评论！',{icon: 2});
+			return false;
+		}
+
+		if(content.replace(/(^s*)|(s*$)/g, "").replace(/(&nbsp;)/g, "").replace(/<BR>/ig,"").replace(/<\/?p>/ig,"").replace( /<img(?:.|\s)*?>/g,'').length > CommentMaxLength){
+			layer.msg('评论内容长度不能超过'+CommentMaxLength+'字符！',{icon: 2});
+			return false;
+		}	
+		content = content.replace(/<\/?p>/ig,"");
+		
+		var CommentUserID 	= GetUserComment();
+		// 判断是否选择匿名评论
+		if($('#isanonymous').is(":checked")){
+			var isanonymous = 1;
+			CommentUserID 	=  GetUuid();
+		};
+		if(fourmAnonymous == 1 && isanonymous == 1){
+			layer.msg('该文章不允许匿名评论！',{icon: 2});
+			return false;
+		}
+		comment_block   = 0;                                                    //状态
+
+		ajax({
+			url  : PostApiUrl, 	//请求地址
+			type : "POST", 		//请求方式
+			data : {
+				'access_token' 	: access_token,
+				'user_id' 		: CommentUserID,
+				'to_user_id' 	: 0,
+				'comment_url' 	: param.comment_url,
+				'comment_title' : param.comment_title,
+				'content' 		: content,
+				'parent_id' 	: 0,
+				'device' 		: 'website',
+				'do' 			: "insert_comment_info",
+				'form_category_id' : param.CommentFormCategoryId,
+				'reply_id'			: 0,
+				
+			},
+			dataType : 'json',
+			success : function(data, status, xhr) {
+				$('#publisharea').val('');                                              //清空评论
+
+				comment_block   = 1;                                                    //状态
+
+				var response = eval("(" + data + ")");
+				
+				if(response.applicationCode == 'P0000'){
+					var templte = '<li ><a class="avatar" href="javascript:;" onclick="return false"><img src="'+response.comment.userimg+'" alt=""></a><div class="comment_content"><span class="commentator">'+response.comment.username;
+					
+					templte += '</span><a class="more_btn" href="javascript:void(0)"></a><div class="comment "><p class="comment">'+content+'</p></div><a href="javascript:void(0);" class="reply"><span>回复</span></a><a href="javascript:void(0);" class="no_of_likes" >0</a><a href="javascript:void(0);" class="no_of_dislikes">0</a><a href="javascript:void(0);" class="comment_time">刚刚</a></div></li>';
+				  	$(".comments_list").prepend(templte);
+				  	layer.msg('评论成功！',{icon: 1});
+				  	$('#total_repnumber').html(parseInt($('#total_repnumber').text())+1);
+					$('.commentNum').html(parseInt($('.commentNum').text())+1);
+				  	// 同步三方
+					var sync_flg = false;
+					var facebook =twitter= 0;
+					if( $('#isfacebook').is(":checked") ){
+						facebook = 1;
+						sync_flg = true;
+					}
+					if( $('#istwitter').is(":checked")){
+						twitter= 1;
+						sync_flg = true;
+					}
+					var uid = $.cookie('dwUid');
+					var share_content = '我在多维网《'+param.comment_title+'》中发布了评论：'+content;
+					var params={'uid':uid,'url':response.comment.commentUrl,'content':share_content,'facebook':facebook,'twitter':twitter};
+					// 有勾选同步到第三方
+					if( sync_flg){
+						 $.ajax({
+							 url:sync_url,
+							 type: 'post',
+							 data: params,
+							 success:function(){},
+							 error: function () {},
+							 dataType: 'json',  
+						 });
+					}
+
+					// // 日志 
+					// ajax({
+					// 	url : 'http://blog.dwnews.com/index.php?r=api/comment_log&callback=?',
+					// 	type : 'GET',
+					// 	data : {
+					// 		'ikey' 		: ikey,
+					// 		'url'		: param.comment_url
+					// 	},
+					// 	// 请求参数
+					// 	dataType : "json",
+					// 	success : function() {
+					
+					// 	},
+					// 	fail : function(status) {
+					// 	}
+					// });
+		        }else{
+		          	if(response.applicationCode == 'P0026'){
+		        		JSsdk.ShowWin(600, 260 , '用戶登录',Login_Url);
+						return false;
+		        	}else{
+		        		layer.msg(response.more,{icon: 2});
+		          		return false;
+		        	}
+		        }
+			},
+			Error : function(xhr, error, exception) {  
+				layer.msg(exception.toString(),{icon: 2}); 
+			}
+		});
+	}
+	// 主评列表生成
+	SDK.prototype.CommentBox = function(param) {
+		
+		var html = '';
+		if(param.children){
+			var sub = '';
+			var childrendata = param.children;
+			var childrenlength = childrendata.length;
+          	for(var j = 0;j < childrenlength; j++){
+          		var support = childrendata[j].support || 0;
+      			// 判断评论是否有隐藏的评论
+      			if(j>(ReNumber-1)){
+      				sub +='<li class="hideComment hideComment'+param.commentID+' com_'+childrendata[j].id+' listcom_'+childrendata[j].id+'"><a class="avatar"';
+      			}else{
+      				if(param.type=='hot'){
+						sub += '<li class="com_'+childrendata[j].id+' hotcom_'+childrendata[j].id+'"><a class="avatar"';
+					}else{
+						sub += '<li class="com_'+childrendata[j].id+' listcom_'+childrendata[j].id+'"><a class="avatar"';
+					}
+      			}
+
+      			if(childrendata[j].usermyurl == null ||childrendata[j].usermyurl==''||childrendata[j].usermyurl==undefined){
+      				sub +=' href="vascript:void(0);">';
+	      			sub +='<img src="'+childrendata[j].userimg+'" alt=""></a><div class="comment_content">';
+	      			sub +='<a href="vascript:void(0);">';
+
+				}else{
+      				sub +='href="'+domain_url+childrendata[j].usermyurl+'" target="_blank">';
+	      			sub +='<img src="'+childrendata[j].userimg+'" alt=""></a><div class="comment_content">';
+	      			sub +='<a href="'+domain_url+childrendata[j].usermyurl+'" target="_blank">';
+				}
+      			
+      			sub +='<span class="commentator">'+childrendata[j].username+'</span></a>';
+      			if(childrendata[j].commentToMyurl == null ||childrendata[j].commentToMyurl==''||childrendata[j].commentToMyurl==undefined){
+					sub +='<a href="vascript:void(0);">';
+				}else{
+      				sub +='<a href="'+domain_url+childrendata[j].commentToMyurl+'" target="_blank">';
+				}
+      			sub +='<span class="reply_comment">'+childrendata[j].commentToUsername+'</span></a><a class="more_btn" href="javascript:void(0)"></a><div class="more_content">';
+      			sub += '<a class=" various report report_violation"  data-comid="'+childrendata[j].id+'" href="javascript:;">举报</a>';
+ 
+      			if(fourmReply==0 || fourmComment==1){
+      				sub +='</div><div class="comment  content_'+childrendata[j].id+'" style="clear:both;"><p class="comment">'+childrendata[j].commentContent+'</p></div><a  href="javascript:void(0);" class=" various sub_reply reply sub_reply'+childrendata[j].id+'" data-edit=0 data-quotepid="'+childrendata[j].id+'" data-replypid="'+param.commentID+'" data-quoteuid="'+childrendata[j].commentUserId+'"  comment_user_name="'+childrendata[j].username+'" ';
+      				if(param.type=='hot'){
+						sub += ' replytype="hot"';
+					}
+      				sub +='><span>回复</span></a>';
+      			}else{
+      				sub +='</div><div class="comment  content_'+childrendata[j].id+'"><p class="comment">'+childrendata[j].commentContent+'</p></div><a href="javascript:void(0);" class="sub_reply reply sub_reply'+childrendata[j].id+'" data-edit=0 canreply=0';
+      				if(param.type=='hot'){
+						sub += ' replytype="hot"';
+					}
+      				sub +='><span>回复</span></a>';
+      			}
+      			
+      			//  取消顶
+  				if(childrendata[j].supportUserFlg && childrendata[j].support>0 && param.CommentUserID != '' && param.CommentUserID != null && param.CommentUserID != noneuid){
+	      			sub += '<a href="javascript:void(0);" class="no_of_likes feedActived" style="background-position-y: -60px;" data-quotepid="'+childrendata[j].id+'">1</a>';
+	      		}else{
+	      			sub += '<a href="javascript:void(0);" class="no_of_likes" data-quoteuid="'+childrendata[j].commentUserId+'" data-quotepid="'+childrendata[j].id+'">'+support+'</a>';
+	      		}
+
+	      		// 取消踩
+	      		if(childrendata[j].dislikeUserFlg && childrendata[j].dislike>0 && param.CommentUserID != ''&& param.CommentUserID != null && param.CommentUserID != noneuid){
+	      			sub += '<a href="javascript:void(0);" class="no_of_dislikes feedActived" data-quotepid="'+childrendata[j].id+'" style="background-position-y: -100px;">'+childrendata[j].dislike+'</a>';
+	      		}else{
+	      			//踩
+	      			sub += '<a href="javascript:void(0);" class="no_of_dislikes" data-quoteuid="'+childrendata[j].commentUserId+'" data-quotepid="'+childrendata[j].id+'">'+childrendata[j].dislike+'</a>';
+	      		}
+      			
+      			sub += '<a href="javascript:void(0);" class="comment_time">'+formatMsgTime(childrendata[j].commentCreatedAt)+'</a></div>';
+      			sub += '</li>';
+          	} 
+					
+          	if(param.type=='hot'){
+				html += '<li class="com_'+param.commentID+' hotcom_'+param.commentID+'">';
+				html += '<div class="hot"><img src="http://s3.dwnews.net/v5/images/comment-hot0'+param.hoti+'.png"></div>';
+			}else{
+				html += '<li class="com_'+param.commentID+' listcom_'+param.commentID+'">';
+			}
+
+			if(param.usermyurl == null ||param.usermyurl==''||param.usermyurl==undefined){
+				html += '<a class="avatar" href="vascript:void(0);"><img src="'+param.userimg+'" alt=""></a><div class="comment_content "><a href="vascript:void(0);">';
+			}else{
+				html += '<a class="avatar" href="'+domain_url+param.usermyurl+'" target="_blank"><img src="'+param.userimg+'" alt=""></a><div class="comment_content "><a href="'+domain_url+param.usermyurl+'" target="_blank">';
+			}
+			html += '<span class="commentator">'+param.userNickname+'</span></a><a class="more_btn" href="javascript:void(0)"></a><div class="more_content">';
+			html += '<a class=" various report report_violation" href="javascript:;" data-comid="'+param.commentID+'">举报</a>';
+
+			html += '</div><div class="comment  content_'+param.commentID+'"><p class="comment">'+param.content+'</p></div>';
+
+			if(fourmReply==0 || fourmComment==1){
+				html += '<a href="javascript:void(0);" class=" various reply_temp reply reply_temp'+param.commentID+'" data-edit=0 comment_user_name="'+param.userNickname+'"  data-quotepid="'+param.commentID+'" data-replypid="'+param.commentID+'" data-quoteuid="'+param.commentUID+' " ';
+					if(param.type=='hot'){
+						html += ' replytype="hot"';
+					}
+					html += '><span>回复</span></a>';
+			}else{
+				html += '<a href="javascript:void(0);"  class="reply_temp reply reply_temp'+param.commentID+'" data-edit=0 canreply=0';
+				if(param.type=='hot'){
+					html += ' replytype="hot"';
+				}
+				html += '><span>回复</span></a>';
+			}
+			
+			
+
+			// 取消顶
+			if(param.supportUserFlg && param.support>0 && param.CommentUserID != ''&& param.CommentUserID != null && param.CommentUserID != noneuid){
+				html += '<a href="javascript:void(0);" class="no_of_likes feedActived" style="background-position-y: -60px;"  data-quotepid="'+param.commentID+'">'+param.support+'</a>';
+			}else{
+				// 顶 
+				html += '<a href="javascript:void(0);" class="no_of_likes" data-quoteuid="'+param.commentUID+'" data-quotepid="'+param.commentID+'">'+param.support+'</a>';
+			}
+
+			// 取消踩
+			if(param.dislikeUserFlg && param.dislike>0 && param.CommentUserID != '' && param.CommentUserID != null&& param.CommentUserID != noneuid){
+				html += '<a href="javascript:void(0);" class="no_of_dislikes feedActived" data-quotepid="'+param.commentID+'" style="background-position-y: -100px;">'+param.dislike+'</a>';
+			}else{
+				// 踩
+				html += '<a href="javascript:void(0);" class="no_of_dislikes" data-quoteuid="'+param.commentUID+'" data-quotepid="'+param.commentID+'">'+param.dislike+'</a>';
+			}
+			
+			html += '<a href="javascript:void(0);" class="comment_time">'+formatMsgTime(param.commentTime)+'</a></div><ul>';
+			html +=	sub+'</ul>';
+
+			if(childrenlength>ReNumber){
+				html += '<a href="javascript:void(0)" datavalue="'+param.commentID+'" class="load_more_comment load_more_comment_little load_more_comment_'+param.commentID+'"><span class="icon"></span>显示更多</a><div class="comment_loading_little comment_littleLoading_icon"><img src="comment/loading.gif"></div>';
+			}		
+			html += '</li>';
+
+		}else{
+			// 主评
+			// 判断是否是热门评论添加热门标记
+			if(param.type=='hot'){
+				html += '<li class="com_'+param.commentID+' hotcom_'+param.commentID+'">';
+				html += '<div class="hot"><img src="http://s3.dwnews.net/v5/images/comment-hot0'+param.hoti+'.png"></div>';
+			}else{
+				html += '<li class="com_'+param.commentID+' listcom_'+param.commentID+'">';
+			}
+			
+			if(param.usermyurl == null ||param.usermyurl==''||param.usermyurl==undefined){
+				html += '<a class="avatar" href="javascript:void(0);"><img src="'+param.userimg+'" alt=""></a><div class="comment_content"><a href="javascript:void(0);">';
+			}else{
+				html += '<a class="avatar" href="'+domain_url+param.usermyurl+'" target="_blank"><img src="'+param.userimg+'" alt=""></a><div class="comment_content"><a href="'+domain_url+param.usermyurl+'" target="_blank">';
+			}
+			html += '<span class="commentator">'+param.userNickname+'</span></a><a class="more_btn" href="javascript:void(0)"></a><div class="more_content">';
+			html += '<a class=" various report report_violation" href="javascript:;" data-comid="'+param.commentID+'">举报</a>';
+			html += '</div><div class="comment  content_'+param.commentID+'"><p class="comment">'+param.content+'</p></div>';
+
+			if(fourmReply==0 || fourmComment==1){
+
+				html += '<a href="javascript:void(0);" class=" various reply_temp reply reply_temp'+param.commentID+'" data-edit=0 comment_user_name="'+param.userNickname+'"  data-quotepid="'+param.commentID+'" data-replypid="'+param.commentID+'" data-quoteuid="'+param.commentUID+'"';
+				if(param.type=='hot'){
+					html += ' replytype="hot"';
+				}
+				html += '><span>回复</span></a>';
+			}else{
+				
+				html += '<a href="javascript:void(0);"  class="reply_temp reply reply_temp'+param.commentID+'" data-edit=0 canreply=0';
+				if(param.type=='hot'){
+					html += ' replytype="hot"';
+				}
+				html += '><span>回复</span></a>';
+			}
+
+			// 取消顶
+			if(param.supportUserFlg && param.support > 0 && param.CommentUserID != '' && param.CommentUserID != null && param.CommentUserID != noneuid){
+				html += '<a href="javascript:void(0);" class="no_of_likes feedActived" style="background-position-y: -60px;"  data-quotepid="'+param.commentID+'">'+param.support+'</a>';
+			}else{
+				// 顶 
+				html += '<a href="javascript:void(0);" class="no_of_likes" data-quoteuid="'+param.commentUID+'" data-quotepid="'+param.commentID+'">'+param.support+'</a>';
+			}
+
+			// 取消踩
+			if(param.dislikeUserFlg && param.dislike > 0 && param.CommentUserID != '' && param.CommentUserID != null && param.CommentUserID != noneuid){
+				html += '<a href="javascript:void(0);" class="no_of_dislikes feedActived" data-quotepid="'+param.commentID+'" style="background-position-y: -100px;">'+param.dislike+'</a>';
+			}else{
+				// 踩
+				html += '<a href="javascript:void(0);" class="no_of_dislikes" data-quoteuid="'+param.commentUID+'" data-quotepid="'+param.commentID+'">'+param.dislike+'</a>';
+			}
+			
+			html += '<a href="javascript:void(0);" class="comment_time">'+formatMsgTime(param.commentTime)+'</a></div>';
+			html += '<ul></ul></li>';
+			
+		}
+
+		$('.' + param.commentList).append(html);
+
+		// 评论的展开与关闭
+		$('.show_more'+param.commentID).bind('click', function() {
+			clicthis = $(this);
+		 	var show_value = clicthis.attr('value');
+
+		 	if(show_value==1){
+		 		clicthis.attr('value',0);			  	//设置值
+		 		clicthis.html('&lt;&lt;收起');        	//改变字体
+		 		clicthis.prev().css("height","100%"); 	//展开
+		 	}else{
+		 		clicthis.attr('value',1);				//设置值
+		 		clicthis.html('&gt;&gt;展开');		  	//改变字体
+		 		clicthis.prev().css("height","56px");	//展开
+
+		 	}
+			
+		})
+
+		// 评论的回复与编辑
+		$('.reply_temp').unbind();
+		$('.reply_temp').bind('click', function() {
+			// 关闭举报框
+			$('.more_content').css('display','none');
+			$('.replyedit').remove();
+			if($(this).attr('canreply')==0){
+				layer.msg('该文章不允许回复评论！',{icon: 2}); 
+				return false;
+			}
+
+			// 编辑按钮的情况下
+			if($(this).attr('data-edit')==1){
+				if($(this).attr('canedit')==0){
+					layer.msg('该文章不允许编辑自己发布的评论！',{icon: 2});
+					return false;
+				}else if($(this).attr('canedit')==2){
+					layer.msg('用户只可以编辑自己发布的评论！',{icon: 2});
+					return false;
+				}
+			}
+			
+			var IsEdit             = $(this).attr('data-edit');
+			var commentId          = parseInt($(this).attr('data-quotepid')); 	//评论id
+			var commentPId         = parseInt($(this).attr('data-replypid')); 	//回复的pid
+			var commentUId         = $(this).attr('data-quoteuid'); 			//评论的用户id
+			var comment_username   = $(this).attr('comment_user_name');			//评论人的用户名
+			var originalcontent    = $('.content_'+commentPId).html();			//回复的原评论内容
+			var CommentUserID      = GetUserComment();
+			var Comment_Content    = $('.content_'+commentPId).html(); 			//评论内容
+			var reply_id           = $(this).attr('data-quotepid'); 	
+			var reply_type         = $(this).attr('replytype'); 
+			var CommentUrl         = param.CommentUrl;
+			var CommentTitle       = param.CommentTitle;
+
+			// 全站评论排行
+			if(reply_type == 'top'){
+				CommentUrl         = $(this).attr('data-url');
+				CommentTitle       = $(this).attr('data-title');
+			}			
+		
+			JSsdk.ReplyBox({
+				commentId  				: commentId,
+				IsEdit  				: IsEdit,
+				commentPId 				: commentPId,
+				commentUId 				: commentUId,
+				issub_reply				: 0,									//是否是次级回复 1是 0否
+				comment_username 		: comment_username,
+				type 					: false,
+				CommentChannelArea 		: param.CommentChannelArea,    			//1
+				CommentFormCategoryId   : param.CommentFormCategoryId, 			//36
+				CommentUrl 				: CommentUrl,      						//'9e59d215aba68abc16092266b87a272b'
+				CommentTitle 			: CommentTitle,  						//'习近平主席亚洲之行的6个感人细节'
+				PostApiUrl 				: PostApiUrl,      						//'http://comment.api.dwnews.com/v1/api?'
+				CommentUserID 			: CommentUserID, 						//1
+				Comment_Content			: Comment_Content,
+				reply_id 				: reply_id,		   				        //回复的pid
+				reply_type 				: reply_type,		   				    //回复的类型 热门or普通主评
+
+			});
+		});
+		
+	};
+
+	//回复框
+	SDK.prototype.ReplyBox = function(param) {
+
+		if($('#comment_'+param.commentId).length>0){
+	      	return false;
+	    }else{
+	    	var userimg =JSsdk.GetCookie('dwUserimg');
+	    	var template = '<form action="" method="get" class="replyedit" style="display:block;">';  
+	    	if(userimg == '' || userimg == undefined){
+	    		template += '<a class="avatar" href="javascript:;" onclick="return false"><img src="'+user_avatar+'" alt=""></a>';
+	    	}else{
+	    		template += '<a class="avatar" href="javascript:;" onclick="return false"><img src="'+userimg+'" alt=""></a>';
+	    	}         
+            
+            template += '<div class="commentbox_wrapper">';
+            template += '<textarea name="message" id="content_'+param.commentId+'" title="我的回应" placeholder="我的回应" style="height:100px;max-height:189px;"></textarea>';
+            template += '<div class="toolbar">';
+            template += '<a href="javascript:void(0)" class="comment-sub various comment-editsub" >';
+            if(param.IsEdit==1){
+				template += '修改';
+			}else{
+				// 判断是否登录
+				var nowu = IsLoginDo();
+				if(nowu){
+					template += '回复</a><p class="annoymous_comment"><input type="checkbox" class="isanonymous" value="1">匿名发布</p>';
+				}else{
+					template += '回复</a>';
+				}
+			}                           
+
+            template +='</div><p class="notice">【声明】 评论应与内容相关，如含有侮辱、淫秽等词汇的字句，将不予发表。</p> </form>';
+      
+          	// 热门评论
+          	if(param.reply_type == 'hot'){ 
+          		$('.hotcom_'+param.commentId).after(template);
+          	}else if(param.reply_type == 'top'){
+          		// 全站评论排行评论
+          		$('.topcom_'+param.commentId).after(template);
+          	}else{
+          		if($('.listcom_'+param.commentId).find('ul').length>0){
+	          		$('.listcom_'+param.commentId).find('ul').before(template);
+	          	}else{
+	          		$('.listcom_'+param.commentId).after(template);
+	          	}
+          	}
+          	
+           
+   //          var editor = new wangEditor('content_'+param.commentId);
+			// editor.config.menus = [
+			// 	'bold',
+			// 	'underline',
+			// 	'italic',						
+			// 	// 'quote',
+			// 	//'emotion',
+			// 	// 'img',
+			// ];
+		 //    editor.config.uploadHeaders = {
+		 //        'Accept' : 'text/x-json'
+		 //    };
+
+		 //    // 隐藏掉插入网络图片功能。该配置，只有在你正确配置了图片上传功能之后才可用。
+		 //    editor.config.hideLinkImg = false;
+			// editor.config.emotions=$.parseJSON(comment_data);
+			
+			// editor.create();
+			// // editor.$txt.html(fourmWordPrompt);
+			// editor.$txt.blur();
+			// $('.wangEditor-txt').css('height','158px');
+			// $('a.sync_comment').unbind();
+			// $('a.sync_comment').bind('click',function(){
+			// 	$(this).siblings('.sync_comment_selectbox').toggle();
+			// });
+			
+			// if(param.IsEdit==1){
+			// 	editor.$txt.html(param.Comment_Content);
+			// }else{
+			// 	editor.$txt.blur();
+			// }
+
+	    	var uname = decodeURI(JSsdk.GetCookie('dwUsername'));
+	    	var uid   = GetUserComment();
+	  
+			$('.comment-editsub').attr('data-quoteid',param.commentId);
+			$('.comment-editsub').attr('data-replypid',param.commentPId);
+			$('.comment-editsub').attr('data-to-uid',param.commentUId);
+
+		 	$('.comment-editsub').unbind();
+			$('.comment-editsub').bind('click', function() {
+				var commentId     = parseInt($(this).attr('data-quoteid'));   	//评论的id
+				var commentPId    = parseInt($(this).attr('data-replypid')); 	//回复的pid
+				var CommentToUid  = $(this).attr('data-to-uid');			  	//被回复的uid
+				object.obj        = $(this);
+				var CommentUserID = GetUserComment();
+				// 判断是否选择匿名评论
+				var	isanonymous = 0;
+
+				if($('.isanonymous').is(":checked")){
+					isanonymous = 1;
+                    CommentUserID   =  GetUuid();
+				};
+				JSsdk.ReplyComment({
+					commentId  		: commentId,
+					comment_username: param.comment_username,
+					commentPId 		: commentPId,
+					issub_reply     : param.issub_reply,
+					CommentToUid    : CommentToUid,
+					CommentChannelArea :param.CommentChannelArea,    	//1
+					CommentFormCategoryId:param.CommentFormCategoryId, 	//36
+					CommentUrl      : param.CommentUrl,      			//'9e59d215aba68abc16092266b87a272b'
+					CommentTitle    : param.CommentTitle,  				//'习近平主席亚洲之行的6个感人细节'
+					PostApiUrl 		: param.PostApiUrl,      			//'http://comment.api.dwnews.com/v1/api?'
+					CommentUserID 	: CommentUserID, 					//回复人uid
+					IsEdit  		: param.IsEdit,
+					isanonymous		: isanonymous,
+					reply_id  		:  param.reply_id,		   			//回复的pid
+
+				});
+			});
+		}
+	}
+	// 回复方法
+	SDK.prototype.ReplyComment = function(param) {
+		var CommentConnent = $("#content_"+param.commentId).val();
+		if(comment_block   == 0){
+			return false;
+		}
+		if (CommentConnent == null || CommentConnent == ''|| CommentConnent == undefined||$.trim(CommentConnent.replace(/(^s*)|(s*$)/g, "").replace(/(&nbsp;)/g, "").replace(/<BR>/ig,"").replace(/<\/?p>/ig,"")).length==0) {
+			layer.msg('内容不能为空！',{icon: 2});
+			return false;
+		}
+		if(fourmComment==0){
+			layer.msg('该文章不可以评论！',{icon: 2});
+			return false;
+		}
+		if(fourmAnonymous == 1 && param.isanonymous == 1){
+            layer.msg('该文章不允许匿名评论！',{icon: 2});
+            return false;
+        }
+
+		if(CommentConnent.replace(/(^s*)|(s*$)/g, "").replace(/(&nbsp;)/g, "").replace(/<BR>/ig,"").replace(/<\/?p>/ig,"").length > CommentMaxLength){
+			layer.msg('评论内容长度不能超过'+CommentMaxLength+'字符！',{icon: 2});
+			return false;
+		}	
+		CommentConnent = CommentConnent.replace(/<\/?p>/ig,"");
+		$('#subreport_body').css('display','none');
+		comment_block   = 0;
+		if(param.IsEdit==1){
+			ajax({
+				url : param.PostApiUrl,
+				type : 'POST',
+				data : {
+					'access_token' 	: access_token,
+					'user_id' 		: param.CommentUserID,
+					'comment_url' 	: param.CommentUrl,
+					'id' 			: param.commentPId,  //评论id
+					'content' 		: CommentConnent,
+					'device' 		: 'website',
+					'do' 			: 'edit_comment_info',
+					'form_category_id' : param.CommentFormCategoryId,
+				},	
+				dataType : 'json',
+				success : function(data, status, xhr) {
+					comment_block   = 1;
+					response = eval("(" + data + ")");
+					if(response.applicationCode == 'P0000'){
+						$('.replyedit').remove();
+						$(".content_"+param.commentPId).html(CommentConnent);
+						$('.more_content').css('display','none');
+						layer.msg('修改成功！',{icon: 1});
+			        }else{
+				        if(response.applicationCode == 'P0026'){
+			        		JSsdk.ShowWin(600, 260 , '用戶登录',Login_Url);
+							return false;
+			        	}else{
+			        		layer.msg(response.more,{icon: 2});
+			          		return false;
+			        	}
+			        }
+				},
+				Error : function(xhr, error, exception) {  
+					layer.msg(exception.toString(),{icon: 2}); 
+				}
+			});
+		}else{
+			ajax({
+				url : param.PostApiUrl,
+				type : 'POST',
+				data : {
+					'access_token' 	: access_token,
+					'user_id' 		: param.CommentUserID,
+					'to_user_id' 	: param.CommentToUid,
+					'comment_url' 	: param.CommentUrl,
+					'comment_title' : param.CommentTitle,
+					'parent_id' 	: param.commentPId,  //回复的父id
+					'content' 		: CommentConnent,
+					'device' 		: 'website',
+					'do' 			: 'insert_comment_info',
+					'form_category_id' : param.CommentFormCategoryId,
+					'reply_id'  	:  param.reply_id,		   //回复的pid
+				},	
+				dataType : 'json',
+				success : function(data, status, xhr) {
+					comment_block   = 1;
+					response = eval("(" + data + ")");
+		    	
+					if(response.applicationCode == 'P0000'){
+						var templte = '<li><a class="avatar" href="javascript:;" onclick="return false">';
+
+						if(param.isanonymous==1){
+							templte +='<img src="'+user_avatar+'" alt="">';
+						}else{
+
+							templte +='<img src="'+response.comment.userimg+'" alt="">';
+						}
+						templte +='</a><div class="comment_content"><span class="commentator">'+response.comment.username+'</span><span class="reply_comment">'+response.comment.commentToUsername+'</span><a class="more_btn" href="javascript:void(0)"></a><div class="comment "><p class="comment">'+CommentConnent+'</p></div><a href="javascript:void(0);" class="sub_reply reply " data-edit="0" ><span>回复</span></a><a href="javascript:void(0);" class="no_of_likes" >0</a><a href="javascript:void(0);" class="no_of_dislikes" >0</a><a href="javascript:void(0);" class="comment_time">刚刚</a></div></li>';
+						
+						if(param.issub_reply==0){
+							$(".com_"+param.commentId).find("ul").prepend(templte);
+						}else{
+							$(".com_"+param.commentId).after(templte);
+						}
+						$('.replyedit').remove();
+						layer.msg('回复成功！',{icon: 1});
+						$('#total_repnumber').html(parseInt($('#total_repnumber').text())+1);
+						$('.commentNum').html(parseInt($('.commentNum').text())+1); 
+					 //  	// 日志 
+						// ajax({
+						// 	url : 'http://blog.dwnews.com/index.php?r=api/comment_log&callback=?',
+						// 	type : 'GET',
+						// 	data : {
+						// 		'ikey' 		: ikey,
+						// 		'url'		: param.CommentUrl
+
+						// 	},
+						// 	// 请求参数
+						// 	dataType : "json",
+						// 	success : function() {
+						
+						// 	},
+						// 	fail : function(status) {
+						// 	}
+						// });
+			        }else{
+			        	if(response.applicationCode == 'P0026'){
+			        		JSsdk.ShowWin(600, 260 , '用戶登录',Login_Url);
+							return false;
+			        	}else{
+			        		layer.msg(response.more,{icon: 2});
+			          		return false;
+			        	}
+			        
+			        }
+					  
+				},
+				Error : function(xhr, error, exception) {   
+					layer.msg(exception.toString(),{icon: 2});
+				}
+			});
+		}
+		
+	}
+	// 踩方法
+	SDK.prototype.Dislike = function(param) {
+		ajax({
+			url : param.PostApiUrl,
+			type : 'POST',
+			data : {
+				'access_token' 		: access_token,
+				'id' 				: param.commentId,
+				'user_id' 			: param.CommentUserID,
+				'do' 				: 'dislike_comment_info',
+
+			},
+			dataType : 'json',
+			success : function(data, status, xhr) {
+				
+				var data = eval("(" + data + ")");
+				
+				if(data.applicationCode == 'P0000'){
+				
+					object.obj.html(parseInt(object.obj.text())+1).css("background-position-y","-100px").addClass("feedActived");
+					// var nod = object.obj.parent().find(".no_of_likes");
+					// if(nod.hasClass("feedActived")){
+					// 	var str2 = nod.text();
+					// 	nod.html(parseInt(str2)-1).css("background-position-y","-40px").removeClass("feedActived");
+					// }
+				    return 'P0000';
+		        }else if(data.applicationCode == 'P0024'){
+		        	object.obj.css("background-position-y","-100px").addClass("feedActived");
+		        	layer.msg(data.more,{icon: 2});
+	     
+	        	}else{
+			        if(data.applicationCode == 'P0026'){
+			        		JSsdk.ShowWin(600, 260 , '用戶登录',Login_Url);
+							return false;
+			        	}else{
+			        		layer.msg(data.more,{icon: 2});
+			          		return false;
+			        	}
+		        }
+				
+			},
+			Error : function(xhr, error, exception) {  
+				layer.msg(exception.toString(),{icon: 2}); 
+			}
+		});
+	}
+
+	// 取消踩
+	SDK.prototype.UnDislike = function(param) {
+		ajax({
+			url : param.PostApiUrl,
+			type : 'POST',
+			data : {
+				'access_token' 		: access_token,
+				'id' 				: param.commentId,
+				'user_id' 			: param.CommentUserID,
+				'do' 				: 'undislike_comment_info',
+			},
+			dataType : 'json',
+			success  : function(data, status, xhr) {
+				var data = eval("(" + data + ")");
+
+				if(data.applicationCode == 'P0000'){
+					object.obj.html(parseInt(object.obj.text())-1).css("background-position-y","-80px").removeClass("feedActived");
+			    	return 'P0000';
+		        }else{
+			       if(data.applicationCode == 'P0026'){
+			        		JSsdk.ShowWin(600, 260 , '用戶登录',Login_Url);
+							return false;
+			        	}else{
+			        		layer.msg(data.more,{icon: 2});
+			          		return false;
+			        	}
+		        }
+				
+			},
+			Error : function(xhr, error, exception) {   
+				layer.msg(exception.toString(),{icon: 2});
+			}
+		});
+	};
+
+	// 顶方法
+	SDK.prototype.ThumbUp = function(param) {
+		ajax({
+			url : param.PostApiUrl,
+			type : 'POST',
+			data : {
+				'access_token' 		: access_token,
+				'id' 				: param.commentId,
+				'user_id' 			: param.CommentUserID,
+				'do' 				: 'support_comment_info',
+			},
+			dataType : 'json',
+			success : function(data, status, xhr) {
+				var data = eval("(" + data + ")");
+
+				if(data.applicationCode == 'P0000'){
+					var str = object.obj.text();
+					object.obj.html(parseInt(str)+1).css("background-position-y","-60px").addClass("feedActived");
+					// var nod = object.obj.parent().find(".no_of_dislikes");
+					// if(nod.hasClass("feedActived")){
+					// 	var str2 = nod.text();
+					// 	nod.html(parseInt(str2)-1).css("background-position-y","-80px").removeClass("feedActived");
+					// }
+				    return false;
+		        }else if(data.applicationCode == 'P0012'){
+		        	var str = object.obj.text();
+					object.obj.css("background-position-y","-60px").addClass("feedActived");
+	      			layer.msg('该文章不允许回复评论！',{icon: 2});
+	        	}else{
+			        if(data.applicationCode == 'P0026'){
+		        		JSsdk.ShowWin(600, 260 , '用戶登录',Login_Url);
+						return false;
+		        	}else{
+		        		layer.msg(data.more,{icon: 2});
+		          		return false;
+		        	}
+		        }
+				
+			},
+			Error : function(xhr, error, exception) {   
+				layer.msg(exception.toString(),{icon: 2});
+			}
+		});
+	}
+	// 取消顶
+	SDK.prototype.UnThumbUp = function(param) {
+		ajax({
+			url : param.PostApiUrl,
+			type : 'POST',
+			data : {
+				'access_token' 		: access_token,
+				'id' 				: param.commentId,
+				'user_id' 			: param.CommentUserID,
+				'do' 				: 'unsupport_comment_info',
+			},
+			dataType : 'json',
+			success  : function(data, status, xhr) {
+				var data = eval("(" + data + ")");
+
+				if(data.applicationCode == 'P0000'){
+					var str = object.obj.text();
+					object.obj.html(parseInt(str)-1).css("background-position-y","-40px").removeClass("feedActived");
+			    	return false;
+		        }else{
+			        if(data.applicationCode == 'P0026'){
+		        		JSsdk.ShowWin(600, 260 , '用戶登录',Login_Url);
+						return false;
+		        	}else{
+		        		layer.msg(data.more,{icon: 2});
+		          		return false;
+		        	}
+		        }
+				
+			},
+			Error : function(xhr, error, exception) {   
+				layer.msg(exception.toString(),{icon: 2});
+			}
+		});
+	};
+
+	// 提交举报
+	SDK.prototype.SubReport = function(param) {
+		ajax({
+			url : param.apiUrl,
+			type : 'POST',
+			data : {
+				'access_token' 		: access_token,
+				'report_from_uid' 	: param.reportFromUid,
+				'comment_id' 		: param.commentId,
+				'report_idtype' 	: param.reportIdtype,
+				'report_content' 	: param.reportContent,
+				'do' 				: "report_comment_info",
+			},
+			dataType : 'json',
+			success : function(data, status, xhr) {
+				data = eval("(" + data + ")");
+				if(data.applicationCode == 'P0000'){
+					$('.more_content').css('display','none');
+					$('#subreport_body').css('display','none');
+		          
+		          	layer.msg('举报成功',{icon: 1});
+		        }else{
+		          	 if(data.applicationCode == 'P0026'){
+		        		JSsdk.ShowWin(600, 260 , '用戶登录',Login_Url);
+						return false;
+		        	}else{
+		        		layer.msg(data.more,{icon: 2});
+		          		return false;
+		        	}
+		        }
+		        return false;
+			},
+			Error : function(xhr, error, exception) {   
+				layer.msg(exception.toString(),{icon: 2});
+			}
+		});
+	}
+	// 表情信息
+	SDK.prototype.GetEmoticon = function(param) {
+		ajax({
+			url : param.api_url,
+			type : 'POST',
+			data : {
+				'access_token' : access_token,
+				'do' : "get_emoticon_info",
+				'channel_area' :param.CommentChannelArea,
+			},
+			dataType : 'json',
+			success : function(data, status, xhr) {
+				if (data) {
+					var left_data = {};
+					editor = new wangEditor('publisharea');
+					editor.config.menus = [
+						'bold',
+						'underline',
+						'italic',						
+						// 'quote',
+						//'emotion',
+						// 'img',
+					];
+					// editor.config.uploadImgUrl 		= uploadImgUrl;
+					// // editor.config.uploadImgFileName = 'comment_image';
+					// editor.config.uploadImgFileName = 'photoimg';
+					
+				    // 设置 headers（举例）
+				    editor.config.uploadHeaders = {
+				        'Accept' : 'text/x-json'
+				    };
+
+				    // 隐藏掉插入网络图片功能。该配置，只有在你正确配置了图片上传功能之后才可用。
+				    editor.config.hideLinkImg = false;
+					comment_data = data;//存储返回数据用于下面回复评论不必再请求数据
+					editor.config.emotions=$.parseJSON(data);
+					// editor.onfocus = function () {
+				 //        editor.$txt.html('');
+				 //    };
+					editor.create();
+					editor.$txt.blur();
+					$('.wangEditor-txt').css('height','158px');
+				}
+			
+			},
+			
+			Error : function(xhr, error, exception) {    
+				layer.msg(exception.toString(),{icon: 2});
+			}
+		});
+	};
+	
+	//生成登录框
+	SDK.prototype.ShowWin = function(width, height, title, src){
+		commonJs.loginLayer();
+	}
+
+	// 获取cookie函数  
+	SDK.prototype.GetCookie = function(name) {
+	    var arr = document.cookie.match(new RegExp("(^| )"+name+"=([^;]*)(;|$)"));
+	    if(arr != null) return unescape(arr[2]); return null;
+	};
+	SDK.prototype.SetCookie = function(name, value, days) {
+	    if(days == null || days == ''){
+	        days = 1;  
+	    }  
+    	var exp = new Date();
+    	exp.setTime(exp.getTime() + days*24*60*60*1000);
+        document.cookie = name + "=" + escape(value) + ";path=/;domain=."+domain+";expires=" + exp.toGMTString();
+        return true;
+	};
+	// 初始化信息
+	SDK.prototype.init = function(param, callback) {
+		
+		// 全局变量记录初始参数用于登陆后无刷新加载数据
+		firstparam      = param;
+		CommentApiUrl   = param.CommentApiUrl;
+		access_token	= param.Access_token;
+		// 分页
+		noneuid         = JSsdk.GetCookie('uuid');					//匿名用户
+		CommentP 		= 0;
+		p           	= 0; 										//开始条数
+		CommentPage 	= 0;										//页数
+		CommentNumber 	= param.CommentNumber; 						//每页数量
+		ReNumber 		= 2; 										//每个评论下面显示的回复数
+		haove_morepage 	= 1;										//是否还能加载页
+        CommentMaxLength = 5000;                                    //默认最大评论长度
+        fourmAnonymous 	= 0;                                    	//是否匿名评论 0 匿名 1 不可匿名
+        fourmPess 		= 0;                                    	//修改权限 0 不能修改 1可以修改
+        fourmReply 		= 0;                                    	//评论是否可回复 0 可以 1不可以
+        fourmComment 	= param.fourmComment;                       //文章冻结是否可以评论 1 可以 0不可以
+		// Login_Url 		= 'http://comment.login.dwnews.com/index/login';
+		uploadImgUrl 	= 'http://demo.dwnews.com/index/upload';   			//评论图片上传地址
+		PostApiUrl 		= 'http://comment.api.dwnews.com/v1/api?';			//post请求接口地址
+		domain_url 		= 'http://blog.dwnews.com/';               			//主域名
+		domain          = 'dwnews.com';                                     //Cookie作用域
+		CommentUserID 	= JSsdk.GetCookie('dwUid') || noneuid;
+		user_avatar     = 'http://uc-api.dwnews.com/images/noavatar_middle.gif';//默认匿名头像
+		sync_url 		= 'http://user-login-api.dwnews.com/index.php?r=login/blogsync&callback=?'; //同步三方接口地址
+		comment_block   = 1;                                                    //状态
+
+	    // 判断是否登录未登录去掉评论框的匿名选择
+		var nowu = IsLoginDo();
+		if(nowu==0){
+			$('.annoymous_comment').remove();
+			$('.share_set').remove();
+		}else{
+			 var userimg_src = $.cookie('dwUserimg');
+	        if(userimg_src){
+	            $(".comment_mavatar").attr('src',userimg_src);
+	        }
+		}
+
+	    // 举报按钮展开关闭
+	    $('#subreport_cancle').click(function(){
+	        $('#subreport_body').css('display','none');
+	    })
+
+		// 热门评论和评论切换
+		$('.tab_comment_article').click(function(){
+			var thistype= $(this).attr('type');
+			$('.tab_comment_article').removeClass('active');
+        	$(this).addClass('active');
+			if(thistype == 'hot'){
+				$('.hotcomments').css('display','block');
+				$('.addedit').css('display','none');
+				$('.comments_listnew').css('display','none');
+				$('.comments_list').css('display','none');
+
+			}else{
+				$('.hotcomments').css('display','none');
+				$('.addedit').css('display','block');
+				$('.comments_listnew').css('display','block');
+				$('.comments_list').css('display','block');
+			}
+		});
+
+		// // 请求热门评论数据
+	 //    $.ajax({
+	 //        type: "get",
+	 //        url: dwnews.dw5_blog+"/index.php?r=person/hotcomment",
+	 //        data: {
+	 //        },
+	 //        dataType : "jsonp",
+	 //        jsonp: "callback",
+	 //        jsonpCallback:"success_jsonpCallback",
+	 //        success: function(data){
+	 //            $('.hotcomments').html(data);
+	 //        }
+	 //    });
+	
+
+		// 页面数据检测
+		ajax({
+			url  : PostApiUrl,
+			type : 'POST',
+			data : {
+				'access_token':param.Access_token,
+				'key' 		: param.CommentUrl,
+				'user_id' 	: CommentUserID,
+				'p' 		: CommentP,
+				'sum' 		: param.CommentNumber,
+				'do'  		: 'get_article_comment_info',
+				'form_category_id' : param.CommentFormCategoryId,
+			},
+			// 请求参数
+			dataType : "json",
+			success : function(data, xml) {
+				var alldata = eval('(' + data + ')');
+				var data = alldata;
+				$('#total_repnumber').html(alldata.count);
+				$('.commentNum').html(alldata.count);
+				//默认最大评论长度
+				if(alldata.fourmParameter.fourmWordOnline >0){
+           			CommentMaxLength = alldata.fourmParameter.fourmWordOnline ;                
+				}
+
+				//是否匿名评论 0 匿名 1 不可匿名
+				if(alldata.fourmParameter.fourmAnonymous == 1){
+           			fourmAnonymous 	= 1;              
+				}
+
+				//修改权限 0 不能修改 1可以修改
+				if(alldata.fourmParameter.fourmPess == 1){
+			    	fourmPess 		= 1;                                    	
+				}
+				// 评论是否可回复 0 可以 1不可以
+				if(alldata.fourmParameter.fourmReply == 1){
+			    	fourmReply 	= 1;                                    	
+				}                                    	
+			    
+				//如果返回条数大于等于每页数量 则显示加载更多
+				if(data.commentList.length >= CommentNumber){
+					if(data.hasMore){
+						$('#pagemore').css('display','block');
+			    		haove_morepage=1;
+			    		loadMoreKey = data.loadMoreKey;
+					}else{
+				    	haove_morepage=0;
+				    	$('#nomore').html('没有更多了！');
+				    }
+				}
+		    	
+
+				// 评论主体,
+				JSsdk.masterBox({
+					id 					 : param.CommentDivId,
+					CommentList 		 : param.CommentList,
+					data 				 : data,
+					bodyclass 			 : param.CommentContainerClass,
+					CommentChannelArea   : param.CommentChannelArea,    	//1
+					CommentFormCategoryId: param.CommentFormCategoryId, 	//36
+					CommentUrl 			 : param.CommentUrl,      			//'9e59d215aba68abc16092266b87a272b'
+					CommentTitle         : param.CommentTitle,  			//'习近平主席亚洲之行的6个感人细节'
+					PostApiUrl           : PostApiUrl,  					//'http://comment.api.dwnews.com/v1/api?'
+					CommentUserID        : param.CommentUserID 				//1
+				});
+
+				$('a.sync_comment').click(function(){
+					$(this).siblings('.sync_comment_selectbox').toggle();
+				});
+
+				// 分页
+				$('#pagemore').bind('click', function() {
+					
+					if(haove_morepage ==0){//是否还有分页
+						return false;
+					}
+					$('#pagemore').css('display','none');
+					$('#loadingimg').css('display','block');
+					CommentPage++;
+					var CommentP = CommentPage*CommentNumber;
+					
+					JSsdk.pageinit({
+						CommentApiUrl 	: PostApiUrl,
+						Access_token    : param.Access_token,
+						PostApiUrl 		: PostApiUrl,
+						CommentUrl 		: param.CommentUrl,
+						CommentTitle 	: param.CommentTitle,
+						CommentUserID 	: param.CommentUserID,
+						CommentP 		: CommentP,
+						CommentNumber 	: param.CommentNumber,
+						CommentContainerClass : param.CommentContainerClass,
+						CommentDivId 	: param.CommentDivId,
+						CommentList 	: param.CommentList,
+						CommentChannelArea 	: param.CommentChannelArea,
+						CommentFormCategoryId 	: param.CommentFormCategoryId
+					}, function(res) {
+						
+					});
+				});
+			},
+			fail : function(xhr,status) {
+
+				// 判断Token是否过期
+				if (xhr == 0){
+					//JSsdk.SetCookie('dw_token','',-1);
+					//location.reload();
+					return false;
+				}
+			}
+		});
+		return this._ajax(param, callback);
+	};
+
+	// 分页请求
+	SDK.prototype.pageinit = function(param, callback) {
+		// 页面数据检测
+		CommentUserID 	= JSsdk.GetCookie('dwUid') || noneuid;
+		ajax({
+			url : param.CommentApiUrl,
+			type : 'POST',
+			data : {
+				'access_token':param.Access_token,
+				'key' 		: param.CommentUrl,
+				'user_id' 	: CommentUserID,
+				'p' 		: param.CommentP,
+				'sum' 		: param.CommentNumber,
+				'do'  		: 'get_article_comment_info',
+				'form_category_id' : param.CommentFormCategoryId,
+				'loadMoreKey' :loadMoreKey,
+			},
+			// 请求参数
+			dataType : "json",
+			success : function(data, xml) {
+				$('#pagemore').css('display','block');
+				$('#loadingimg').css('display','none');
+				var alldata = eval('(' + data + ')');
+				var data = alldata.commentList;
+				if(alldata.hasMore){
+		    		haove_morepage=1;
+		    		loadMoreKey = alldata.loadMoreKey;
+				}else{
+			    	haove_morepage=0;
+			    	$('#pagemore').html('<span class="icon"></span>没有更多了！');
+			    }
+				
+				
+				// 评论主体
+				// 循环生成主评论列表
+				JSsdk.CommentList({
+					id 			: param.CommentDivId,
+					CommentList : param.CommentList,
+					data        : data,
+					bodyclass 	: param.CommentContainerClass,
+					CommentChannelArea : param.CommentChannelArea,     	//1
+					CommentFormCategoryId:param.CommentFormCategoryId, 	//36
+					CommentUrl  : param.CommentUrl,      				//'9e59d215aba68abc16092266b87a272b'
+					CommentTitle: param.CommentTitle,    				//'习近平主席亚洲之行的6个感人细节'
+					PostApiUrl  : param.PostApiUrl,      				//'http://comment.api.dwnews.com/v1/api?'
+					CommentUserID:param.CommentUserID    				//1
+				});
+			},
+			fail : function(status) {
+			}
+		});
+		return this._ajax(param, callback);
+	};
+	
+	win.JSsdk = new SDK(); 
+})(window, document);
+
+// ajax 封装
+function ajax(options) {
+	options 		= options || {};
+	options.type 	= (options.type || "GET").toUpperCase();
+	options.dataType= options.dataType || "json";
+	var params 		= formatParams(options.data);
+	if (window.XMLHttpRequest) {
+		var xhr = new XMLHttpRequest();
+	} else { // IE6及其以下版本浏览器
+		var xhr = new ActiveXObject('Microsoft.XMLHTTP');
+	}
+	xhr.onreadystatechange = function() {
+		if (xhr.readyState == 4) {
+			var status = xhr.status;
+			if (status >= 200 && status < 300) {
+				options.success
+						&& options.success(xhr.responseText, xhr.responseXML);
+			} else {
+				options.fail && options.fail(status);
+			}
+		}
+	}
+	if (options.type == "GET") {
+		xhr.open("GET", options.url + "&" + params, true);
+		xhr.send(null);
+	} else if (options.type == "POST") {
+		xhr.open("POST", options.url, true);
+		// 设置表单提交时的内容类型
+		xhr.setRequestHeader("Content-Type",
+				"application/x-www-form-urlencoded");
+		xhr.send(params);
+	}
+}
+
+// 格式化参数
+function formatParams(data) {
+	var arr = [];
+	for ( var name in data) {
+		arr.push(encodeURIComponent(name) + "="
+				+ encodeURIComponent(data[name]));
+	}
+	
+	return arr.join("&");
+}
+
+function getPropertyCount(o) {
+	var n, count = 0;
+	for (n in o) {
+		if (o.hasOwnProperty(n)) {
+			count++;
+		}
+	}
+	return count;
+}
+
+// 获取json长度
+function getJsonObjLength(jsonObj) {
+	var Length = 0;
+	for ( var item in jsonObj) {
+	  Length++;
+	}
+	return Length;
+}
+
+// 获取用户uid
+function GetUserComment() {	
+	var CommentUserID = JSsdk.GetCookie('dwUid');
+    if(CommentUserID && CommentUserID != null){
+	    return CommentUserID;	
+    }else{
+        return JSsdk.GetCookie('uuid');
+    }
+};
+
+// 获取用户uuid
+function GetUuid() { 
+    var CommentUuID = JSsdk.GetCookie('uuid');
+    return CommentUuID;   
+};
+
+
+//判断是否登录
+function IsLoginDo () {
+    var islogin = JSsdk.GetCookie('dwUid');
+    if(islogin && islogin != null){
+        return 1;
+    }else{
+        return 0;
+    }
+};
+// 时间戳转换
+function formatMsgTime (timespan) {
+  var timespan = timespan*1000;
+  var dateTime = new Date(timespan);
+
+  var year = dateTime.getFullYear();
+  var month = dateTime.getMonth() + 1;
+  var day = dateTime.getDate();
+  var hour = dateTime.getHours();
+  var minute = dateTime.getMinutes();
+  var second = dateTime.getSeconds();
+  var now = new Date();
+  var now_new =now.getTime();
+
+  var milliseconds = 0;
+  var timeSpanStr;
+
+  milliseconds = now_new - timespan;
+
+  if (milliseconds <= 1000 * 60 * 1) {
+    timeSpanStr = '刚刚';
+  }
+  else if (1000 * 60 * 1 < milliseconds && milliseconds <= 1000 * 60 * 60) {
+    timeSpanStr = Math.round((milliseconds / (1000 * 60))) + '分钟前';
+  }
+  else if (1000 * 60 * 60 * 1 < milliseconds && milliseconds <= 1000 * 60 * 60 * 24) {
+    timeSpanStr = Math.round(milliseconds / (1000 * 60 * 60)) + '小时前';
+  }
+  else if (1000 * 60 * 60 * 24 < milliseconds && milliseconds <= 1000 * 60 * 60 * 24 * 15) {
+    timeSpanStr = Math.round(milliseconds / (1000 * 60 * 60 * 24)) + '天前';
+  }
+  else if (milliseconds > 1000 * 60 * 60 * 24 * 15 && year == now.getFullYear()) {
+    timeSpanStr = month + '-' + day + ' ' + hour + ':' + minute;
+  } else {
+    timeSpanStr = year + '-' + month + '-' + day + ' ' + hour + ':' + minute;
+  }
+  return timeSpanStr;
+};

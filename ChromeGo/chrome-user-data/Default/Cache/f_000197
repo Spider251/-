@@ -1,0 +1,574 @@
+/**
+ * www.dwnews.com website rank .Created by guotaidou@dwnews.com on 2017/6/30.
+ */
+var ranking = function () {
+    function loadJs(url, fn) {
+        var script = document.createElement('script');
+        script.type = 'text/javascript';
+        var isJs = /(\.js)$/.exec(url);
+        if (script.readyState) {
+            script.onreadystatechange = function () {
+                if (script.readyState == 'loaded' || script.readyState == 'complete') {
+                    script.onreadystatechange = null;
+                    fn instanceof Function && fn.call();
+                    !isJs && script.parentNode.removeChild(script);
+                }
+            };
+        }
+        else {
+            script.onload = function () {
+                fn instanceof Function && fn.call();
+                !isJs && script.parentNode.removeChild(script);
+            };
+        }
+        script.src = encodeURI(url);
+        document.getElementsByTagName('head')[0].appendChild(script);
+    }
+    //var dwkerUrl = dwnews.dw5_url+"/hot/hot.js";
+    //var dwkerUrl = "http://club2017.dwnews.com/hot/hot.js";
+    var dwkerUrl = dwnews.dw5_blog+"/hot/hot.js";
+    //var newsUrl="http://www.dwnews.com/html/share/24-7topnews.js";
+    var fonts = "big5/";
+    fonts = publicJs.checkLang()=="zh-cn"?"":"big5/";
+    var newsUrl = dwnews.dw5_site+fonts+"html/share/24-7topnews.js";
+	function insertHtmlFunc(num, defaultNum, data,mixpanel) {
+        var insertHtml = '';
+        mixpanel=mixpanel||"";
+        if (num == 0) {
+            for (var i = num; i < defaultNum; i++) {
+                insertHtml += '<li> <div class="ico">' + (i + 1) + '</div> <a mixpanel.track="'+mixpanel+(i+1)+'" target="_blank" href="' + data[i].url + '">' + data[i].title + '</a></li> '
+            }
+        } else {
+	    var ranksTotal = data.length<(defaultNum * 2)?data.length:defaultNum * 2;
+            for (var i = num; i < ranksTotal; i++) {
+                insertHtml += '<li> <div class="ico">' + (i + 1) + '</div> <a target="_blank" href="' + data[i].url + '">' + data[i].title + '</a></li> '
+            }
+        }
+        return insertHtml
+    }
+    function insertHtmlFunc1(data,mixpanel) {
+        var insertHtml = '';
+        mixpanel=mixpanel||"";
+        for (var i = 0; i < 10; i++) {
+            insertHtml += '<li> <div class="xulie">' + (i + 1) + '</div> <a mixpanel.track="'+mixpanel+(i+1)+'" target="_blank" href="' + data[i].url + '">' + data[i].title + '</a></li>'
+        }
+        return insertHtml
+    }
+    function addHtml() {
+        var html = '<div class="tit"> <h4 class="kjph" style="float:left;"><a href="javascript:;">新闻排行</a><span style="left:0;bottom:6px;" class="arrow-down"></span></h4> <div class="qh">' +
+            ' <dl> <dd class="hover"><a href="javascript:;">24小时</a></dd> <dd><a href="javascript:;">7天</a></dd> </dl> </div> ' +
+            '<div class="kjph"><a href="javascript:;">多维客排行</a><span style="border-top-width:0px;left:0;bottom:6px;" class="arrow-down"></span></div> </div> <ul> <div class="clear"></div> </ul>' +
+            ' <div class="xiala"><a href="javascript:;">&nbsp;</a></div> <div class="clear"></div>'
+        return html;
+    }
+    function addHtmlIndex() {
+        var html = '<style>.arrow-down{position: relative;width: 0;height: 0;border-left: 10px solid transparent;border-right: 10px solid transparent;border-top: 10px solid #9d1919;font-size: 0;}</style>' +
+            '<div class="tit"> <h4 class="kjph" style="float:left;"><a href="javascript:;">新闻排行</a><span style="left:0;bottom:13px;" class="arrow-down"></span></h4> <div class="qh">' +
+            ' <dl> <dd class="hover"><a href="javascript:;">24小时</a></dd> <dd><a href="javascript:;">7天</a></dd> </dl> </div> ' +
+            '<div class="kjph"><a href="javascript:;">多维客排行</a><span style="border-top-width:0px;left:0;bottom:13px;" class="arrow-down"></span></div> </div> <ul> <div class="clear"></div> </ul>' +
+            ' <div class="xiala"><a href="javascript:;">&nbsp;</a></div> <div class="clear"></div>'
+        return html;
+    }
+    function addHtmlHumanity() {
+        var html = '<style>.arrow-down{position: relative;width: 0;height: 0;border-left: 10px solid transparent;border-right: 10px solid transparent;border-top: 10px solid #e2931d;font-size: 0;}</style>' +
+            '<div class="tit"> <h4 class="kjph" style="float:left;"><a href="javascript:;">新闻排行</a><span style="left:0;bottom:13px;" class="arrow-down"></span></h4> <div class="qh">' +
+            ' <dl> <dd class="hover"><a href="javascript:;">24小时</a></dd> <dd><a href="javascript:;">7天</a></dd> </dl> </div> ' +
+            '<div class="kjph"><a href="javascript:;">多维客排行</a><span style="border-top-width:0px;left:0;bottom:13px;" class="arrow-down"></span></div> </div> <ul> <div class="clear"></div> </ul>' +
+            ' <div class="xiala"><a href="javascript:;">&nbsp;</a></div> <div class="clear"></div>'
+        return html;
+    }
+    return {
+        rightRank: function (tagHead) {
+            $('.' + tagHead + '-r-paih-top a').attr('href', 'javascript:;');
+            $('.' + tagHead + '-r-paih-qian a').attr('href', 'javascript:;');
+            $('.' + tagHead + '-r-paih-ul li').remove();
+            $('.' + tagHead + '-r-paih-top li').eq(0).click(function () {
+                loadJs(newsUrl, function () {
+                    var hourData = rankingData.newsRanklist["24H"];
+                    var dayData = rankingData.newsRanklist["7D"];
+                    $('.' + tagHead + '-r-paih-qian dl dd').eq(1).removeClass('hover');
+                    $('.' + tagHead + '-r-paih-qian dl dd').eq(0).addClass('hover');
+                    $('.' + tagHead + '-r-paih-ul ul li').remove();
+                    var insertHtml = insertHtmlFunc1(hourData,"新闻排行");
+                    $('.' + tagHead + '-r-paih-ul ul').append(insertHtml);
+                    $('.' + tagHead + '-r-paih-top li').eq(0).addClass('hover');
+                    $('.' + tagHead + '-r-paih-top li').eq(1).removeClass('hover');
+                    $('.' + tagHead + '-r-paih-qian dl dd').eq(1).unbind();
+                    $('.' + tagHead + '-r-paih-qian dl dd').eq(0).unbind();
+                    $('.' + tagHead + '-r-paih-qian dl dd').eq(1).click(function () {
+                        $(this).addClass('hover');
+                        $('.' + tagHead + '-r-paih-qian dl dd').eq(0).removeClass('hover');
+                        var insertHtml = insertHtmlFunc1(dayData,"新闻排行7天");
+                        $('.' + tagHead + '-r-paih-ul ul li').remove()
+                        $('.' + tagHead + '-r-paih-ul ul').append(insertHtml);
+                    })
+                    $('.' + tagHead + '-r-paih-qian dl dd').eq(0).click(function () {
+                        $(this).addClass('hover');
+                        $('.' + tagHead + '-r-paih-qian dl dd').eq(1).removeClass('hover');
+                        var insertHtml = insertHtmlFunc1(hourData,"新闻排行");
+                        $('.' + tagHead + '-r-paih-ul ul li').remove()
+                        $('.' + tagHead + '-r-paih-ul ul').append(insertHtml);
+                    })
+                })
+            })
+            if ($('.' + tagHead + '-r-paih-top a').eq(1).html() == '图集排行'||$('.' + tagHead + '-r-paih-top a').eq(1).html() == '圖集排行') {
+                $('.' + tagHead + '-r-paih-top li').eq(1).click(function () {
+                    loadJs(newsUrl, function () {
+                        var photoHourData = rankingData.photoRanklist["24H"];
+                        var photoDayData = rankingData.photoRanklist["7D"];
+                        $('.' + tagHead + '-r-paih-qian dl dd').eq(1).removeClass('hover');
+                        $('.' + tagHead + '-r-paih-qian dl dd').eq(0).addClass('hover');
+                        $('.' + tagHead + '-r-paih-ul ul li').remove()
+                        var insertHtml = insertHtmlFunc1(photoHourData,"新闻排行");
+                        $('.' + tagHead + '-r-paih-ul ul').append(insertHtml);
+                        $('.' + tagHead + '-r-paih-top li').eq(1).addClass('hover');
+                        $('.' + tagHead + '-r-paih-top li').eq(0).removeClass('hover');
+                        $('.' + tagHead + '-r-paih-qian dl dd').eq(0).unbind();
+                        $('.' + tagHead + '-r-paih-qian dl dd').eq(1).unbind();
+                        $('.' + tagHead + '-r-paih-qian dl dd').eq(1).click(function () {
+                            $(this).addClass('hover');
+                            $('.' + tagHead + '-r-paih-qian dl dd').eq(0).removeClass('hover');
+                            var insertHtml = insertHtmlFunc1(photoDayData,"新闻排行7天");
+                            $('.' + tagHead + '-r-paih-ul ul li').remove()
+                            $('.' + tagHead + '-r-paih-ul ul').append(insertHtml);
+                        })
+                        $('.' + tagHead + '-r-paih-qian dl dd').eq(0).click(function () {
+                            $(this).addClass('hover');
+                            $('.' + tagHead + '-r-paih-qian dl dd').eq(1).removeClass('hover');
+                            var insertHtml = insertHtmlFunc1(photoHourData,"新闻排行");
+                            $('.' + tagHead + '-r-paih-ul ul li').remove()
+                            $('.' + tagHead + '-r-paih-ul ul').append(insertHtml);
+                        })
+                    })
+                })
+            } else {
+                $('.' + tagHead + '-r-paih-top li').eq(1).click(function () {
+                    loadJs(dwkerUrl, function () {
+                        $('.' + tagHead + '-r-paih-qian dl dd').eq(1).removeClass('hover');
+                        $('.' + tagHead + '-r-paih-qian dl dd').eq(0).addClass('hover');
+                        $('.' + tagHead + '-r-paih-ul ul li').remove()
+                        var insertHtml = insertHtmlFunc1(hot_24,"多维客排行");
+                        $('.' + tagHead + '-r-paih-ul ul').append(insertHtml);
+                        $('.' + tagHead + '-r-paih-top li').eq(1).addClass('hover');
+                        $('.' + tagHead + '-r-paih-top li').eq(0).removeClass('hover');
+                        $('.' + tagHead + '-r-paih-qian dl dd').eq(0).unbind();
+                        $('.' + tagHead + '-r-paih-qian dl dd').eq(1).unbind();
+                        $('.' + tagHead + '-r-paih-qian dl dd').eq(1).click(function () {
+                            $(this).addClass('hover');
+                            $('.' + tagHead + '-r-paih-qian dl dd').eq(0).removeClass('hover');
+                            var insertHtml = insertHtmlFunc1(hot_7,"多维客排行7天");
+                            $('.' + tagHead + '-r-paih-ul ul li').remove()
+                            $('.' + tagHead + '-r-paih-ul ul').append(insertHtml);
+                        })
+                        $('.' + tagHead + '-r-paih-qian dl dd').eq(0).click(function () {
+                            $(this).addClass('hover');
+                            $('.' + tagHead + '-r-paih-qian dl dd').eq(1).removeClass('hover');
+                            var insertHtml = insertHtmlFunc1(hot_24,"多维客排行");
+                            $('.' + tagHead + '-r-paih-ul ul li').remove()
+                            $('.' + tagHead + '-r-paih-ul ul').append(insertHtml);
+                        })
+                    })
+                })
+            }
+            $('.' + tagHead + '-r-paih-top li').eq(0).click();
+        },
+        indexRank:function(){
+            var URL = window.location.href;
+            var index = URL.lastIndexOf("\/");
+            var str = URL.substring(index + 1, URL.length);
+            var img1 = 'http://s0.dwnews.net/v5/images/ind-lf-xl.png';
+            var img2 = 'http://s0.dwnews.net/v5/images/ind-lf-sq.png';
+            var defaultNum = 9;
+            var appendclass = '.left-paih';
+            $(appendclass).html(addHtmlIndex());
+            function xl_click(data,mixpanel) {
+                if ($(appendclass + ' ul li').length == defaultNum) {
+                    $(appendclass + ' ul .clear').before(insertHtmlFunc(defaultNum, defaultNum, data,mixpanel));
+                    $('.xiala').css('background-image', 'url(' + img2 + ')');
+                    $(appendclass).find('ul').css("max-height","none");
+                } else {
+                    for (var i = defaultNum; i < defaultNum * 2; i++) {
+                        $(appendclass + ' ul li').last().remove();
+                    }
+                    $('.xiala').css('background-image', 'url(' + img1 + ')');
+                    $(appendclass).find('ul').css("max-height","225px");
+                }
+            }
+            $('.tit h4').click(function () {
+                loadJs(newsUrl, function () {
+                    var hourData = rankingData.newsRanklist["24H"];
+                    var dayData = rankingData.newsRanklist["7D"];
+                    $('.xiala').css('background-image', 'url(' + img1 + ')')
+                    $('.left-paih ul li').remove()
+                    var insertHtml = insertHtmlFunc(0, 9, hourData,"24小时");
+                    $('.left-paih ul .clear').before(insertHtml)
+                    $('.xiala').unbind();
+                    $('.xiala').click(function () {
+                        if ($('.qh dl dd').eq(1).attr('class') == 'hover') {
+                            xl_click(dayData,"7天")
+                        } else {
+                            xl_click(hourData,"24小时")
+                        }
+                    })
+                    $('.tit .qh dl dd').eq(1).removeClass('hover');
+                    $('.tit .qh dl dd').eq(0).addClass('hover');
+                    $('.tit h4 span').css('border-top-width', '10px');
+                    $('.tit div.kjph span').css('border-top-width', '0');
+                    $('.tit .qh dl dd').eq(0).unbind();
+                    $('.tit .qh dl dd').eq(1).unbind();
+                    $('.qh dl dd').eq(1).click(function () {
+                        $(this).addClass('hover');
+                        $('.qh dl dd').eq(0).removeClass('hover');
+                        var insertHtml = insertHtmlFunc(0, defaultNum, dayData,"7天");
+                        $(appendclass + ' ul li').remove()
+                        $(appendclass + ' ul .clear').before(insertHtml);
+                        $('.xiala').css('background-image', 'url(' + img1 + ')')
+                    })
+                    $('.qh dl dd').eq(0).click(function () {
+                        $(this).addClass('hover');
+                        $('.qh dl dd').eq(1).removeClass('hover');
+                        var insertHtml = insertHtmlFunc(0, defaultNum, hourData,"24小时");
+                        $(appendclass + ' ul li').remove()
+                        $(appendclass + ' ul .clear').before(insertHtml);
+                        $('.xiala').css('background-image', 'url(' + img1 + ')')
+                    })
+                })
+            })
+            $('div.kjph').click(function () {
+                loadJs(dwkerUrl, function () {
+                    $('.xiala').css('background-image', 'url(' + img1 + ')')
+                    $('.left-paih ul li').remove()
+                    var insertHtml = insertHtmlFunc(0, 9, hot_24,"多维客");
+                    $('.left-paih ul .clear').before(insertHtml)
+                    $('.xiala').unbind()
+                    $('.xiala').click(function () {
+                        if ($('.qh dl dd').eq(1).attr('class') == 'hover') {
+                            xl_click(hot_7,"多维客7天")
+                        } else {
+                            xl_click(hot_24,"多维客")
+                        }
+                    })
+                    $('.tit .qh dl dd').eq(1).removeClass('hover');
+                    $('.tit .qh dl dd').eq(0).addClass('hover');
+                    $('.tit h4 span').css('border-top-width', '0');
+                    $('.tit div.kjph span').css('border-top-width', '10px');
+
+                    $('.tit .qh dl dd').eq(0).unbind();
+                    $('.tit .qh dl dd').eq(1).unbind();
+                    $('.qh dl dd').eq(1).click(function () {
+                        $(this).addClass('hover');
+                        $('.qh dl dd').eq(0).removeClass('hover');
+                        var insertHtml = insertHtmlFunc(0, defaultNum, hot_7,"多维客7天");
+                        $(appendclass + ' ul li').remove()
+                        $(appendclass + ' ul .clear').before(insertHtml);
+                        $('.xiala').css('background-image', 'url(' + img1 + ')')
+                    })
+                    $('.qh dl dd').eq(0).click(function () {
+                        $(this).addClass('hover');
+                        $('.qh dl dd').eq(1).removeClass('hover');
+                        var insertHtml = insertHtmlFunc(0, defaultNum, hot_24,"多维客");
+                        $(appendclass + ' ul li').remove()
+                        $(appendclass + ' ul .clear').before(insertHtml);
+                        $('.xiala').css('background-image', 'url(' + img1 + ')')
+                    })
+                })
+            })
+            $('.tit h4').click()
+        },
+        humanityRank:function(){
+            var URL = window.location.href;
+            var index = URL.lastIndexOf("\/");
+            var str = URL.substring(index + 1, URL.length);
+            var img1 = 'http://s0.dwnews.net/v5/images/ind-lf-xl.png';
+            var img2 = 'http://s0.dwnews.net/v5/images/ind-lf-sq.png';
+            var defaultNum = 6;
+            var appendclass = '.hu-paih';
+            $(appendclass).html(addHtmlHumanity());
+            function xl_click(data,mixpanel) {
+                if ($(appendclass + ' ul li').length == defaultNum) {
+                    $(appendclass + ' ul .clear').before(insertHtmlFunc(defaultNum, defaultNum, data,mixpanel));
+                    $('.xiala').css('background-image', 'url(' + img2 + ')')
+                } else {
+                    for (var i = defaultNum; i < defaultNum * 2; i++) {
+                        $(appendclass + ' ul li').last().remove();
+                    }
+                    $('.xiala').css('background-image', 'url(' + img1 + ')')
+                }
+            }
+            $('.tit h4').click(function () {
+                loadJs(newsUrl, function () {
+                    var hourData = rankingData.newsRanklist["24H"];
+                    var dayData = rankingData.newsRanklist["7D"];
+                    $('.xiala').css('background-image', 'url(' + img1 + ')')
+                    $('.hu-paih ul li').remove()
+                    var insertHtml = insertHtmlFunc(0, 6, hourData,"新闻排行");
+                    $('.hu-paih ul .clear').before(insertHtml)
+                    $('.xiala').unbind()
+                    $('.xiala').click(function () {
+                        if ($('.qh dl dd').eq(1).attr('class') == 'hover') {
+                            xl_click(dayData,"新闻排行7天")
+                        } else {
+                            xl_click(hourData,"新闻排行")
+                        }
+                    })
+                    $('.tit .qh dl dd').eq(1).removeClass('hover');
+                    $('.tit .qh dl dd').eq(0).addClass('hover');
+                    $('.tit h4 span').css('border-top-width', '10px');
+                    $('.tit div.kjph span').css('border-top-width', '0');
+
+                    $('.tit .qh dl dd').eq(0).unbind();
+                    $('.tit .qh dl dd').eq(1).unbind();
+                    $('.qh dl dd').eq(1).click(function () {
+                        $(this).addClass('hover');
+                        $('.qh dl dd').eq(0).removeClass('hover');
+                        var insertHtml = insertHtmlFunc(0, defaultNum, dayData,"新闻排行7天");
+                        $(appendclass + ' ul li').remove()
+                        $(appendclass + ' ul .clear').before(insertHtml);
+                        $('.xiala').css('background-image', 'url(' + img1 + ')')
+                    })
+                    $('.qh dl dd').eq(0).click(function () {
+                        $(this).addClass('hover');
+                        $('.qh dl dd').eq(1).removeClass('hover');
+                        var insertHtml = insertHtmlFunc(0, defaultNum, hourData,"新闻排行");
+                        $(appendclass + ' ul li').remove()
+                        $(appendclass + ' ul .clear').before(insertHtml);
+                        $('.xiala').css('background-image', 'url(' + img1 + ')')
+                    })
+                })
+            })
+            $('div.kjph').click(function () {
+                loadJs(dwkerUrl, function () {
+                    $('.xiala').css('background-image', 'url(' + img1 + ')')
+                    $('.hu-paih ul li').remove()
+                    var insertHtml = insertHtmlFunc(0, 6, hot_24,"多维客排行");
+                    $('.hu-paih ul .clear').before(insertHtml)
+                    $('.xiala').unbind()
+                    $('.xiala').click(function () {
+                        if ($('.qh dl dd').eq(1).attr('class') == 'hover') {
+                            xl_click(hot_7,"多维客排行7天")
+                        } else {
+                            xl_click(hot_24,"多维客排行")
+                        }
+                    })
+                    $('.tit .qh dl dd').eq(1).removeClass('hover');
+                    $('.tit .qh dl dd').eq(0).addClass('hover');
+                    $('.tit h4 span').css('border-top-width', '0');
+                    $('.tit div.kjph span').css('border-top-width', '10px');
+
+                    $('.tit .qh dl dd').eq(0).unbind();
+                    $('.tit .qh dl dd').eq(1).unbind();
+                    $('.qh dl dd').eq(1).click(function () {
+                        $(this).addClass('hover');
+                        $('.qh dl dd').eq(0).removeClass('hover');
+                        var insertHtml = insertHtmlFunc(0, defaultNum, hot_7,"多维客排行7天");
+                        $(appendclass + ' ul li').remove()
+                        $(appendclass + ' ul .clear').before(insertHtml);
+                        $('.xiala').css('background-image', 'url(' + img1 + ')')
+                    })
+                    $('.qh dl dd').eq(0).click(function () {
+                        $(this).addClass('hover');
+                        $('.qh dl dd').eq(1).removeClass('hover');
+                        var insertHtml = insertHtmlFunc(0, defaultNum, hot_24,"多维客排行");
+                        $(appendclass + ' ul li').remove()
+                        $(appendclass + ' ul .clear').before(insertHtml);
+                        $('.xiala').css('background-image', 'url(' + img1 + ')')
+                    })
+                })
+            })
+            $('.tit h4').click()
+        },
+        leftRank: function () {
+            var URL = window.location.href;
+            var index = URL.lastIndexOf("\/");
+            var str = URL.substring(index + 1, URL.length);
+            if(URL.indexOf('economics') >-1){
+                var img1 = 'http://s0.dwnews.net/v5/images/blue-lf-xl.png';
+                var img2 = 'http://s0.dwnews.net/v5/images/blue-lf-sq.png';
+            }else{
+                var img1 = 'http://s0.dwnews.net/v5/images/ind-lf-xl.png';
+                var img2 = 'http://s0.dwnews.net/v5/images/ind-lf-sq.png';
+            }
+            var defaultNum = 9;
+            var appendclass = '.left-paih';
+            $(appendclass).html(addHtml());
+            function xl_click(data,mixpanel) {
+                if ($(appendclass + ' ul li').length == defaultNum) {
+                    $(appendclass + ' ul .clear').before(insertHtmlFunc(defaultNum, defaultNum, data,mixpanel));
+                    $('.xiala').css('background-image', 'url(' + img2 + ')')
+                } else {
+                    for (var i = defaultNum; i < defaultNum * 2; i++) {
+                        $(appendclass + ' ul li').last().remove();
+                    }
+                    $('.xiala').css('background-image', 'url(' + img1 + ')')
+                }
+            }
+            $('.tit h4').click(function () {
+                loadJs(newsUrl, function () {
+                    var hourData = rankingData.newsRanklist["24H"];
+                    var dayData = rankingData.newsRanklist["7D"];
+                    $('.xiala').css('background-image', 'url(' + img1 + ')')
+                    $('.left-paih ul li').remove()
+                    var insertHtml = insertHtmlFunc(0, 9, hourData,"新闻排行");
+                    $('.left-paih ul .clear').before(insertHtml)
+                    $('.xiala').unbind()
+                    $('.xiala').click(function () {
+                        if ($('.qh dl dd').eq(1).attr('class') == 'hover') {
+                            xl_click(dayData,"新闻排行")
+                        } else {
+                            xl_click(hourData,"新闻排行7天")
+                        }
+                    })
+                    $('.tit .qh dl dd').eq(1).removeClass('hover');
+                    $('.tit .qh dl dd').eq(0).addClass('hover');
+                    $('.tit h4 span').css('border-top-width', '10px');
+                    $('.tit div.kjph span').css('border-top-width', '0');
+
+                    $('.tit .qh dl dd').eq(0).unbind();
+                    $('.tit .qh dl dd').eq(1).unbind();
+                    $('.qh dl dd').eq(1).click(function () {
+                        $(this).addClass('hover');
+                        $('.qh dl dd').eq(0).removeClass('hover');
+                        var insertHtml = insertHtmlFunc(0, defaultNum, dayData,"新闻排行7天");
+                        $(appendclass + ' ul li').remove()
+                        $(appendclass + ' ul .clear').before(insertHtml);
+                        $('.xiala').css('background-image', 'url(' + img1 + ')')
+                    })
+                    $('.qh dl dd').eq(0).click(function () {
+                        $(this).addClass('hover');
+                        $('.qh dl dd').eq(1).removeClass('hover');
+                        var insertHtml = insertHtmlFunc(0, defaultNum, hourData,"新闻排行");
+                        $(appendclass + ' ul li').remove()
+                        $(appendclass + ' ul .clear').before(insertHtml);
+                        $('.xiala').css('background-image', 'url(' + img1 + ')')
+                    })
+                })
+            })
+            $('div.kjph').click(function () {
+                loadJs(dwkerUrl, function () {
+                    $('.xiala').css('background-image', 'url(' + img1 + ')')
+                    $('.left-paih ul li').remove()
+                    var insertHtml = insertHtmlFunc(0, 9, hot_24,"多维客排行");
+                    $('.left-paih ul .clear').before(insertHtml)
+
+                    $('.xiala').unbind()
+                    $('.xiala').click(function () {
+                        if ($('.qh dl dd').eq(1).attr('class') == 'hover') {
+                            xl_click(hot_7,"多维客排行7天")
+                        } else {
+                            xl_click(hot_24,"多维客排行")
+                        }
+                    })
+                    $('.tit .qh dl dd').eq(1).removeClass('hover');
+                    $('.tit .qh dl dd').eq(0).addClass('hover');
+                    $('.tit h4 span').css('border-top-width', '0');
+                    $('.tit div.kjph span').css('border-top-width', '10px');
+                    $('.tit .qh dl dd').eq(0).unbind();
+                    $('.tit .qh dl dd').eq(1).unbind();
+                    $('.qh dl dd').eq(1).click(function () {
+                        $(this).addClass('hover');
+                        $('.qh dl dd').eq(0).removeClass('hover');
+                        var insertHtml = insertHtmlFunc(0, defaultNum, hot_7,"多维客排行7天");
+                        $(appendclass + ' ul li').remove()
+                        $(appendclass + ' ul .clear').before(insertHtml);
+                        $('.xiala').css('background-image', 'url(' + img1 + ')')
+                    })
+                    $('.qh dl dd').eq(0).click(function () {
+                        $(this).addClass('hover');
+                        $('.qh dl dd').eq(1).removeClass('hover');
+                        var insertHtml = insertHtmlFunc(0, defaultNum, hot_24,"多维客排行");
+                        $(appendclass + ' ul li').remove()
+                        $(appendclass + ' ul .clear').before(insertHtml);
+                        $('.xiala').css('background-image', 'url(' + img1 + ')')
+                    })
+                })
+            })
+            $('.tit h4').click()
+        },
+        dwkerRank: function () {
+            $('.r-paih-top a').attr('href', 'javascript:;');
+            $('.r-paih-qian a').attr('href', 'javascript:;');
+            $('.r-paih-ul li').remove();
+            $('.r-paih-top li').eq(0).click(function () {
+                loadJs(dwkerUrl, function () {
+                    $('.r-paih-ul ul li').remove()
+                    $('.r-paih-qian dl dd').eq(1).removeClass('hover');
+                    $('.r-paih-qian dl dd').eq(0).addClass('hover');
+                    var insertHtml = insertHtmlFunc1(hot_24,"多维客排行");
+                    $('.r-paih-ul ul').append(insertHtml);
+                    $('.r-paih-top li').eq(0).addClass('hover');
+                    $('.r-paih-top li').eq(1).removeClass('hover');
+                    $('.r-paih-qian dl dd').eq(0).unbind();
+                    $('.r-paih-qian dl dd').eq(1).unbind();
+                    $('.r-paih-qian dl dd').eq(1).click(function () {
+                        $(this).addClass('hover');
+                        $('.r-paih-qian dl dd').eq(0).removeClass('hover');
+                        var insertHtml = insertHtmlFunc1(hot_7,"多维客排行7天");
+                        $('.r-paih-ul ul li').remove()
+                        $('.r-paih-ul ul').append(insertHtml);
+                    })
+                    $('.r-paih-qian dl dd').eq(0).click(function () {
+                        $(this).addClass('hover');
+                        $('.r-paih-qian dl dd').eq(1).removeClass('hover');
+                        var insertHtml = insertHtmlFunc1(hot_24,"多维客排行");
+                        $('.r-paih-ul ul li').remove()
+                        $('.r-paih-ul ul').append(insertHtml);
+                    })
+                })
+            })
+            $('.r-paih-top li').eq(1).click(function () {
+                loadJs(newsUrl, function () {
+                    var hourData = rankingData.newsRanklist["24H"];
+                    var dayData = rankingData.newsRanklist["7D"];
+                    $('.r-paih-qian dl dd').eq(1).removeClass('hover');
+                    $('.r-paih-qian dl dd').eq(0).addClass('hover');
+                    $('.r-paih-ul ul li').remove()
+                    var insertHtml = insertHtmlFunc1(hourData,"新闻排行");
+                    $('.r-paih-ul ul').append(insertHtml);
+                    $('.r-paih-top li').eq(1).addClass('hover');
+                    $('.r-paih-top li').eq(0).removeClass('hover');
+                    $('.r-paih-qian dl dd').eq(1).unbind();
+                    $('.r-paih-qian dl dd').eq(0).unbind();
+                    $('.r-paih-qian dl dd').eq(1).click(function () {
+                        $(this).addClass('hover');
+                        $('.r-paih-qian dl dd').eq(0).removeClass('hover');
+                        var insertHtml = insertHtmlFunc1(dayData,"新闻排行7天");
+                        $('.r-paih-ul ul li').remove()
+                        $('.r-paih-ul ul').append(insertHtml);
+                    })
+                    $('.r-paih-qian dl dd').eq(0).click(function () {
+                        $(this).addClass('hover');
+                        $('.r-paih-qian dl dd').eq(1).removeClass('hover');
+                        var insertHtml = insertHtmlFunc1(hourData,"新闻排行");
+                        $('.r-paih-ul ul li').remove()
+                        $('.r-paih-ul ul').append(insertHtml);
+                    })
+                })
+            })
+            $('.r-paih-top li').eq(0).click()
+        }
+    };
+}();
+$(function () {
+    var URL = window.location.href;
+    var dwHost = window.location.hostname;
+    var index = URL.lastIndexOf("\/");
+    var str = URL.substring(index + 1, URL.length);
+    if(dwHost=="www.dwnews.com"){
+    // if(dwHost=="127.0.0.1"){
+        $('.left-paih').css('background','none');
+        ranking.indexRank()
+    }else if(URL.indexOf('culture') >-1){
+        $('.hu-paih').css('background','none');
+        ranking.humanityRank()
+    } else if($('.left-paih').length == 1){
+        ranking.leftRank();
+    }
+    if ($('.dwk-pbl .r-paih').length == 1) {
+        ranking.dwkerRank()
+    }
+    if ($('.tag-r-paih').length == 1) {
+        ranking.rightRank('tag');
+    } else if ($('.newsli-r-paih').length == 1) {
+        ranking.rightRank('newsli');
+    }
+});
